@@ -68,7 +68,9 @@ target_compile_options(CppUTestExt PRIVATE
 # -----------------------------------------------------------------------------
 # Production library
 # -----------------------------------------------------------------------------
-add_library(ft_irc STATIC )
+add_library(ft_irc STATIC 
+src/Client.cpp 
+src/ClientRegistry.cpp)
 target_include_directories(ft_irc PUBLIC include)
 target_compile_options(ft_irc PRIVATE ${PROJECT_WARNING_FLAGS})
 
