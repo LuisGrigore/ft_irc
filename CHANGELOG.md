@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
+- [8cece78](https://github.com/LuisGrigore/ft_irc/commit/8cece7866bad86a45c5faedfded8375aedf64a60) implement Client and ClientRegistry classes Closes #5 (**FEAT-002**) [Closes #5](https://github.com/LuisGrigore/ft_irc/issues/5)
 - [7c60ba5](https://github.com/LuisGrigore/ft_irc/commit/7c60ba59dd2718aeda7b60a62ea3ed8a72174661) implemented base and irc exceptions Closes #1 (**FEAT-001**) [Closes #1](https://github.com/LuisGrigore/ft_irc/issues/1)
 
 ### Devops
@@ -21,7 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [4da1ec4](https://github.com/LuisGrigore/ft_irc/commit/4da1ec4e12070165b361a1791e2b2fd287686900) updated implementation_plan.md with script (**HOTFIX-001**)
 
+### Chore
 
+- [bca3e93](https://github.com/LuisGrigore/ft_irc/commit/bca3e93bd911eb78e6af5b506bc9e10d2166ad29) update changelog
 
 
 
