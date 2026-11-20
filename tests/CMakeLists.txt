@@ -18,6 +18,7 @@ add_executable(unit_tests test_main.cpp
 unit/test_Client.cpp 
 unit/test_ClientRegistry 
 unit/test_AuthenticationManager 
+unit/test_NickManager 
 )
 target_link_libraries(unit_tests PRIVATE ft_irc CppUTestExt CppUTest)
 target_include_directories(unit_tests PRIVATE ${PROJECT_INCLUDE_DIRS})
@@ -43,6 +44,7 @@ set_source_files_properties(
 	unit/test_Client.cpp
 	unit/test_ClientRegistry
 	unit/test_AuthenticationManager
+	unit/test_NickManager
     PROPERTIES
     COMPILE_FLAGS "-isystem ${cpputest_SOURCE_DIR}/include -isystem ${cpputest_SOURCE_DIR}/CppUTestExt/include"
 )
