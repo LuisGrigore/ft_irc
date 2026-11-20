@@ -25,7 +25,8 @@ features:
     description: Refactor BaseException
 - id: FEAT-002
   name: Client entity and ClientRegistry
-  related_elements: []
+  related_elements:
+  - client_subsystem.mmd
   depends_on:
   - FEAT-001
   acceptance_criteria:
@@ -37,20 +38,32 @@ features:
       retain unsent or unprocessed bytes between event-loop iterations.
   - id: AC-006
     description: ClientRegistry indexes each live client by file descriptor and supports lookup by fd
-      and by registered nickname without returning stale or disconnected clients.
+      without returning stale or disconnected clients.
   - id: AC-007
-    description: Registering, retrieving, and removing clients keeps all registry indexes consistent and
-      prevents duplicate fd or nickname ownership.
+    description: Registering, retrieving, and removing clients keeps the registry consistent and prevents
+      duplicate fd ownership.
   - id: AC-008
     description: Operations on unknown, already-registered, or already-removed clients raise the corresponding
       typed business exception.
+  - id: AC-201
+    description: ClientBuffer appends pushed data at the end and preserves byte order across any number
+      of consecutive pushes.
+  - id: AC-202
+    description: peek(length) returns at most the first length bytes without modifying the buffer, and
+      consume(length) removes exactly those bytes from the front without ever removing more than is stored.
+  - id: AC-203
+    description: find(needle) returns the position of the first occurrence of the needle or std::string::npos
+      when absent, and empty(), size() and clear() always reflect the current content.
+  - id: AC-204
+    description: Data that arrives fragmented across several pushes is retained so that a delimiter split
+      between two pushes can still be found afterwards.
   tasks:
   - id: T-004
-    description: Tests Client
+    description: Tests Client and ClientBuffer
   - id: T-005
-    description: Implement Client
+    description: Implement Client and ClientBuffer
   - id: T-006
-    description: Refactor Client
+    description: Refactor Client and ClientBuffer
   - id: T-007
     description: Tests ClientRegistry
   - id: T-008
@@ -80,8 +93,7 @@ features:
   - id: T-010
     description: Tests AuthenticationManager
   - id: T-011
-    related_elements:
-    - client_subsystem.mmd
+    description: Implement AuthenticationManager
   - id: T-012
     description: Refactor AuthenticationManager
 - id: FEAT-004
@@ -122,6 +134,38 @@ features:
     description: Implement RegistrationManager
   - id: T-018
     description: Refactor RegistrationManager
+- id: FEAT-039
+  name: Client pending I/O management (PendingIOManager)
+  related_elements:
+  - client_subsystem.mmd
+  depends_on:
+  - FEAT-002
+  acceptance_criteria:
+  - id: AC-207
+    description: pushInput and pushOutput append data to the target client's input or output buffer and
+      mark that fd as having pending input or pending output.
+  - id: AC-208
+    description: getNextInputLine extracts exactly one complete line, removes it from the input buffer,
+      and returns false when no complete line is available, leaving partial data untouched.
+  - id: AC-209
+    description: An fd stops being reported as having pending input when no complete line remains, and
+      stops being reported as having pending output once its output buffer is empty.
+  - id: AC-210
+    description: peekOutput does not modify the output buffer, and consumeOutput removes exactly the bytes
+      reported as sent, keeping the remaining bytes in order for the next write.
+  - id: AC-211
+    description: getHasPendingInput and getHasPendingOutput return consistent snapshots of the fds that
+      currently have data to process or to send.
+  - id: AC-212
+    description: Operations on an unknown fd raise the corresponding typed business exception and do not
+      create any pending state.
+  tasks:
+  - id: T-179
+    description: Tests PendingIOManager
+  - id: T-180
+    description: Implement PendingIOManager
+  - id: T-181
+    description: Refactor PendingIOManager
 - id: FEAT-005
   name: Channel entity and ChannelRegistry
   related_elements:
@@ -160,13 +204,90 @@ features:
     description: Implement ChannelRegistry
   - id: T-024
     description: Refactor ChannelRegistry
+- id: FEAT-041
+  name: Channel membership and settings management (ChannelMembershipManager, ChannelSettingsManager)
+  related_elements:
+  - channel_subsystem.mmd
+  depends_on:
+  - FEAT-002
+  - FEAT-005
+  acceptance_criteria:
+  - id: AC-218
+    description: createChannel registers a new channel in the ChannelRegistry and adds the creating client
+      as its first member and operator.
+  - id: AC-219
+    description: addMemberToChannel and removeClientFromChannel update both the channel's member set and
+      the client's joined channel set, keeping them consistent.
+  - id: AC-220
+    description: removeClientFromChannel also removes the client's operator and invite status for that
+      channel, and removes the channel from the registry when its last member leaves.
+  - id: AC-221
+    description: removeClientFromAllChannels removes the client from every channel it has joined and leaves
+      no stale membership, operator or invite state behind.
+  - id: AC-222
+    description: isMember, isOperator and isInvited report the current state accurately, and return false
+      for clients with no relation to the channel.
+  - id: AC-223
+    description: setOperator grants or revokes operator status only for clients that are members of the
+      channel.
+  - id: AC-224
+    description: addInviteToChannel records an invitation and consumeInviteToChannel removes it, so an
+      invitation can be used only once.
+  - id: AC-225
+    description: ChannelSettingsManager updates invite-only, topic-protected, limit, key and topic on
+      an existing channel and does not alter members, operators or invitations.
+  - id: AC-226
+    description: Operations on an unknown channel, an unknown client, or a client that is already a member
+      or not a member raise the corresponding typed business exception.
+  tasks:
+  - id: T-185
+    description: Tests ChannelMembershipManager
+  - id: T-186
+    description: Implement ChannelMembershipManager
+  - id: T-187
+    description: Refactor ChannelMembershipManager
+  - id: T-188
+    description: Tests ChannelSettingsManager
+  - id: T-189
+    description: Implement ChannelSettingsManager
+  - id: T-190
+    description: Refactor ChannelSettingsManager
+- id: FEAT-042
+  name: Channel broadcast management (ChannelBroadcastManager)
+  related_elements:
+  - channel_subsystem.mmd
+  - client_subsystem.mmd
+  depends_on:
+  - FEAT-005
+  - FEAT-039
+  acceptance_criteria:
+  - id: AC-227
+    description: broadcast queues the given message in the output of every current member of the channel
+      through PendingIOManager.
+  - id: AC-228
+    description: The client identified by the fd argument (the sender) does not receive its own message.
+  - id: AC-229
+    description: Broadcasting to a channel with no other members is a no-op and does not raise an error.
+  - id: AC-230
+    description: Broadcasting to an unknown channel raises the corresponding typed business exception
+      and does not queue any output.
+  - id: AC-231
+    description: broadcast does not modify channel membership or settings.
+  tasks:
+  - id: T-191
+    description: Tests ChannelBroadcastManager
+  - id: T-192
+    description: Implement ChannelBroadcastManager
+  - id: T-193
+    description: Refactor ChannelBroadcastManager
 - id: FEAT-006
   name: Channel management (ChannelSystem)
   related_elements:
   - channel_subsystem.mmd
   depends_on:
   - FEAT-005
-  - FEAT-002
+  - FEAT-041
+  - FEAT-042
   acceptance_criteria:
   - id: AC-025
     description: ChannelSystem validates channel names and coordinates channel creation, joining, leaving,
@@ -186,22 +307,64 @@ features:
   - id: AC-030
     description: Invalid channel names, attempts to join inaccessible channels, duplicate membership,
       or attempts to leave a channel the client has not joined raise appropriate business exceptions.
+  - id: AC-232
+    description: ChannelDetails exposes a snapshot of a channel's name, topic, key, limit, invite-only
+      flag, topic-protected flag, member fds and operator fds.
+  - id: AC-233
+    description: ChannelDetails is a plain value type that can be copied and remains valid after the channel
+      it was built from is modified or removed.
   tasks:
   - id: T-025
     description: Tests ChannelSystem
   - id: T-026
-    description: Implement ChannelSystem
+    description: Implement ChannelSystem and ChannelDetails struct
   - id: T-027
     description: Refactor ChannelSystem
+- id: FEAT-040
+  name: Client lifecycle management (ClientLifecycleManager)
+  related_elements:
+  - client_subsystem.mmd
+  - channel_subsystem.mmd
+  depends_on:
+  - FEAT-002
+  - FEAT-003
+  - FEAT-004
+  - FEAT-039
+  - FEAT-041
+  acceptance_criteria:
+  - id: AC-213
+    description: addClient registers a new client for the given fd in an unauthenticated, unregistered
+      and non-quitting state, and a duplicate fd raises the corresponding typed business exception.
+  - id: AC-214
+    description: removeClient releases everything owned by the client, including channel memberships,
+      reserved nickname, authentication and registration state, and pending I/O state, before removing
+      it from the registry.
+  - id: AC-215
+    description: After removeClient no subsystem keeps a stale reference to the removed fd or its nickname,
+      and the nickname becomes available again.
+  - id: AC-216
+    description: Removing an unknown fd raises the corresponding typed business exception and does not
+      affect any other client.
+  - id: AC-217
+    description: getIsQuitting returns the fds of clients marked as quitting, and getClientsToClose returns
+      only those quitting clients whose pending output has already been fully sent.
+  tasks:
+  - id: T-182
+    description: Tests ClientLifecycleManager
+  - id: T-183
+    description: Implement ClientLifecycleManager
+  - id: T-184
+    description: Refactor ClientLifecycleManager
 - id: FEAT-007
   name: Client management (ClientSystem)
   related_elements:
   - client_subsystem.mmd
   depends_on:
-  - FEAT-004
-  - FEAT-003
-  - FEAT-006
   - FEAT-002
+  - FEAT-003
+  - FEAT-004
+  - FEAT-039
+  - FEAT-040
   acceptance_criteria:
   - id: AC-031
     description: ClientSystem tracks connected, pending-registration, and quitting clients without placing
@@ -218,11 +381,17 @@ features:
   - id: AC-035
     description: Requests involving unknown clients or invalid client lifecycle transitions raise the
       appropriate business exception.
+  - id: AC-205
+    description: ClientDetails exposes a snapshot of a client's fd, nick, username, realname, hostname,
+      authenticated, registered and quitting flags, and joined channel names.
+  - id: AC-206
+    description: ClientDetails is a plain value type that can be copied and remains valid after the client
+      it was built from is removed or modified.
   tasks:
   - id: T-028
     description: Tests ClientSystem
   - id: T-029
-    description: Implement ClientSystem
+    description: Implement ClientSystem and ClientDetails struct
   - id: T-030
     description: Refactor ClientSystem
 - id: FEAT-008

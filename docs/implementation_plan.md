@@ -9,11 +9,15 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 | ID | Name | Related Elements |
 |----|------|------------------|
 | FEAT-001 | BaseException and Business exceptions (one per IRC error code) | None |
-| FEAT-002 | Client entity and ClientRegistry | None |
+| FEAT-002 | Client entity and ClientRegistry | `client_subsystem.mmd` |
 | FEAT-003 | Client authentication management | `client_subsystem.mmd` |
 | FEAT-004 | Client registration management | `client_subsystem.mmd` |
+| FEAT-039 | Client pending I/O management (PendingIOManager) | `client_subsystem.mmd` |
 | FEAT-005 | Channel entity and ChannelRegistry | `channel_subsystem.mmd` |
+| FEAT-041 | Channel membership and settings management (ChannelMembershipManager, ChannelSettingsManager) | `channel_subsystem.mmd` |
+| FEAT-042 | Channel broadcast management (ChannelBroadcastManager) | `channel_subsystem.mmd`, `client_subsystem.mmd` |
 | FEAT-006 | Channel management (ChannelSystem) | `channel_subsystem.mmd` |
+| FEAT-040 | Client lifecycle management (ClientLifecycleManager) | `client_subsystem.mmd`, `channel_subsystem.mmd` |
 | FEAT-007 | Client management (ClientSystem) | `client_subsystem.mmd` |
 | FEAT-008 | IRCDto | None |
 | FEAT-009 | ISecurityFilter and SecurityFilterFactory | `security_filtering.mmd` |
@@ -54,14 +58,14 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 | T-001 | Tests BaseException | — | FEAT-001 | None |
 | T-002 | Implement BaseException | — | FEAT-001 | None |
 | T-003 | Refactor BaseException | — | FEAT-001 | None |
-| T-004 | Tests Client | — | FEAT-002 | None |
-| T-005 | Implement Client | — | FEAT-002 | None |
-| T-006 | Refactor Client | — | FEAT-002 | None |
+| T-004 | Tests Client and ClientBuffer | — | FEAT-002 | None |
+| T-005 | Implement Client and ClientBuffer | — | FEAT-002 | None |
+| T-006 | Refactor Client and ClientBuffer | — | FEAT-002 | None |
 | T-007 | Tests ClientRegistry | — | FEAT-002 | None |
 | T-008 | Implement ClientRegistry | — | FEAT-002 | None |
 | T-009 | Refactor ClientRegistry | — | FEAT-002 | None |
 | T-010 | Tests AuthenticationManager | — | FEAT-003 | None |
-| T-011 |  | — | FEAT-003 | `client_subsystem.mmd` |
+| T-011 | Implement AuthenticationManager | — | FEAT-003 | None |
 | T-012 | Refactor AuthenticationManager | — | FEAT-003 | None |
 | T-013 | Tests NickManager | — | FEAT-004 | None |
 | T-014 | Implement NickManager | — | FEAT-004 | None |
@@ -69,17 +73,32 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 | T-016 | Tests RegistrationManager | — | FEAT-004 | None |
 | T-017 | Implement RegistrationManager | — | FEAT-004 | None |
 | T-018 | Refactor RegistrationManager | — | FEAT-004 | None |
+| T-179 | Tests PendingIOManager | — | FEAT-039 | None |
+| T-180 | Implement PendingIOManager | — | FEAT-039 | None |
+| T-181 | Refactor PendingIOManager | — | FEAT-039 | None |
 | T-019 | Tests Channel | — | FEAT-005 | None |
 | T-020 | Implement Channel | — | FEAT-005 | None |
 | T-021 | Refactor Channel | — | FEAT-005 | None |
 | T-022 | Tests ChannelRegistry | — | FEAT-005 | None |
 | T-023 | Implement ChannelRegistry | — | FEAT-005 | None |
 | T-024 | Refactor ChannelRegistry | — | FEAT-005 | None |
+| T-185 | Tests ChannelMembershipManager | — | FEAT-041 | None |
+| T-186 | Implement ChannelMembershipManager | — | FEAT-041 | None |
+| T-187 | Refactor ChannelMembershipManager | — | FEAT-041 | None |
+| T-188 | Tests ChannelSettingsManager | — | FEAT-041 | None |
+| T-189 | Implement ChannelSettingsManager | — | FEAT-041 | None |
+| T-190 | Refactor ChannelSettingsManager | — | FEAT-041 | None |
+| T-191 | Tests ChannelBroadcastManager | — | FEAT-042 | None |
+| T-192 | Implement ChannelBroadcastManager | — | FEAT-042 | None |
+| T-193 | Refactor ChannelBroadcastManager | — | FEAT-042 | None |
 | T-025 | Tests ChannelSystem | — | FEAT-006 | None |
-| T-026 | Implement ChannelSystem | — | FEAT-006 | None |
+| T-026 | Implement ChannelSystem and ChannelDetails struct | — | FEAT-006 | None |
 | T-027 | Refactor ChannelSystem | — | FEAT-006 | None |
+| T-182 | Tests ClientLifecycleManager | — | FEAT-040 | None |
+| T-183 | Implement ClientLifecycleManager | — | FEAT-040 | None |
+| T-184 | Refactor ClientLifecycleManager | — | FEAT-040 | None |
 | T-028 | Tests ClientSystem | — | FEAT-007 | None |
-| T-029 | Implement ClientSystem | — | FEAT-007 | None |
+| T-029 | Implement ClientSystem and ClientDetails struct | — | FEAT-007 | None |
 | T-030 | Refactor ClientSystem | — | FEAT-007 | None |
 | T-031 | Implement IRCDto struct | — | FEAT-008 | None |
 | T-032 | Implement ISecurityFilter | — | FEAT-009 | None |
@@ -237,8 +256,8 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 | AC-003 | Business exceptions preserve actionable context (such as nickname, channel, command, or parameter) without depending on transport-layer state. | FEAT-001 |
 | AC-004 | Client stores and exposes its connection identity, registration/authentication state, nickname, username, real name, and connection metadata without inconsistent duplicate state. | FEAT-002 |
 | AC-005 | Client input and output buffers preserve byte order, support partial reads/writes, and retain unsent or unprocessed bytes between event-loop iterations. | FEAT-002 |
-| AC-006 | ClientRegistry indexes each live client by file descriptor and supports lookup by fd and by registered nickname without returning stale or disconnected clients. | FEAT-002 |
-| AC-007 | Registering, retrieving, and removing clients keeps all registry indexes consistent and prevents duplicate fd or nickname ownership. | FEAT-002 |
+| AC-006 | ClientRegistry indexes each live client by file descriptor and supports lookup by fd without returning stale or disconnected clients. | FEAT-002 |
+| AC-007 | Registering, retrieving, and removing clients keeps the registry consistent and prevents duplicate fd ownership. | FEAT-002 |
 | AC-008 | Operations on unknown, already-registered, or already-removed clients raise the corresponding typed business exception. | FEAT-002 |
 | AC-009 | AuthenticationManager validates the configured server password using the supplied PASS value and does not authenticate a client when the password is absent or incorrect. | FEAT-003 |
 | AC-010 | Authentication state is tracked independently for each client and changes to authenticated only after successful validation. | FEAT-003 |
@@ -395,6 +414,39 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 | AC-161 | INVITE enforces issuer membership/operator rules and validates that the target exists and is not already a channel member. | FEAT-036 |
 | AC-162 | An invitation permits the invited client to pass the invite-only join check and is consumed or retained according to the server's documented invitation policy. | FEAT-036 |
 | AC-163 | Missing parameters, unknown nicknames/channels, existing membership, and insufficient privileges raise the corresponding business exceptions and IRC numeric replies. | FEAT-036 |
+| AC-201 | ClientBuffer appends pushed data at the end and preserves byte order across any number of consecutive pushes. | FEAT-002 |
+| AC-202 | peek(length) returns at most the first length bytes without modifying the buffer, and consume(length) removes exactly those bytes from the front without ever removing more than is stored. | FEAT-002 |
+| AC-203 | find(needle) returns the position of the first occurrence of the needle or std::string::npos when absent, and empty(), size() and clear() always reflect the current content. | FEAT-002 |
+| AC-204 | Data that arrives fragmented across several pushes is retained so that a delimiter split between two pushes can still be found afterwards. | FEAT-002 |
+| AC-205 | ClientDetails exposes a snapshot of a client's fd, nick, username, realname, hostname, authenticated, registered and quitting flags, and joined channel names. | FEAT-007 |
+| AC-206 | ClientDetails is a plain value type that can be copied and remains valid after the client it was built from is removed or modified. | FEAT-007 |
+| AC-207 | pushInput and pushOutput append data to the target client's input or output buffer and mark that fd as having pending input or pending output. | FEAT-039 |
+| AC-208 | getNextInputLine extracts exactly one complete line, removes it from the input buffer, and returns false when no complete line is available, leaving partial data untouched. | FEAT-039 |
+| AC-209 | An fd stops being reported as having pending input when no complete line remains, and stops being reported as having pending output once its output buffer is empty. | FEAT-039 |
+| AC-210 | peekOutput does not modify the output buffer, and consumeOutput removes exactly the bytes reported as sent, keeping the remaining bytes in order for the next write. | FEAT-039 |
+| AC-211 | getHasPendingInput and getHasPendingOutput return consistent snapshots of the fds that currently have data to process or to send. | FEAT-039 |
+| AC-212 | Operations on an unknown fd raise the corresponding typed business exception and do not create any pending state. | FEAT-039 |
+| AC-213 | addClient registers a new client for the given fd in an unauthenticated, unregistered and non-quitting state, and a duplicate fd raises the corresponding typed business exception. | FEAT-040 |
+| AC-214 | removeClient releases everything owned by the client, including channel memberships, reserved nickname, authentication and registration state, and pending I/O state, before removing it from the registry. | FEAT-040 |
+| AC-215 | After removeClient no subsystem keeps a stale reference to the removed fd or its nickname, and the nickname becomes available again. | FEAT-040 |
+| AC-216 | Removing an unknown fd raises the corresponding typed business exception and does not affect any other client. | FEAT-040 |
+| AC-217 | getIsQuitting returns the fds of clients marked as quitting, and getClientsToClose returns only those quitting clients whose pending output has already been fully sent. | FEAT-040 |
+| AC-218 | createChannel registers a new channel in the ChannelRegistry and adds the creating client as its first member and operator. | FEAT-041 |
+| AC-219 | addMemberToChannel and removeClientFromChannel update both the channel's member set and the client's joined channel set, keeping them consistent. | FEAT-041 |
+| AC-220 | removeClientFromChannel also removes the client's operator and invite status for that channel, and removes the channel from the registry when its last member leaves. | FEAT-041 |
+| AC-221 | removeClientFromAllChannels removes the client from every channel it has joined and leaves no stale membership, operator or invite state behind. | FEAT-041 |
+| AC-222 | isMember, isOperator and isInvited report the current state accurately, and return false for clients with no relation to the channel. | FEAT-041 |
+| AC-223 | setOperator grants or revokes operator status only for clients that are members of the channel. | FEAT-041 |
+| AC-224 | addInviteToChannel records an invitation and consumeInviteToChannel removes it, so an invitation can be used only once. | FEAT-041 |
+| AC-225 | ChannelSettingsManager updates invite-only, topic-protected, limit, key and topic on an existing channel and does not alter members, operators or invitations. | FEAT-041 |
+| AC-226 | Operations on an unknown channel, an unknown client, or a client that is already a member or not a member raise the corresponding typed business exception. | FEAT-041 |
+| AC-227 | broadcast queues the given message in the output of every current member of the channel through PendingIOManager. | FEAT-042 |
+| AC-228 | The client identified by the fd argument (the sender) does not receive its own message. | FEAT-042 |
+| AC-229 | Broadcasting to a channel with no other members is a no-op and does not raise an error. | FEAT-042 |
+| AC-230 | Broadcasting to an unknown channel raises the corresponding typed business exception and does not queue any output. | FEAT-042 |
+| AC-231 | broadcast does not modify channel membership or settings. | FEAT-042 |
+| AC-232 | ChannelDetails exposes a snapshot of a channel's name, topic, key, limit, invite-only flag, topic-protected flag, member fds and operator fds. | FEAT-006 |
+| AC-233 | ChannelDetails is a plain value type that can be copied and remains valid after the channel it was built from is modified or removed. | FEAT-006 |
 
 ---
 
@@ -409,9 +461,9 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 
 ### FEAT-002 — Client entity and ClientRegistry
 
-**Related Elements:** None  
+**Related Elements:** `client_subsystem.mmd`  
 **Tasks:** T-004 to T-009  
-**Acceptance Criteria:** AC-004 to AC-008  
+**Acceptance Criteria:** AC-004 to AC-204  
 **Depends on:** FEAT-001
 
 ### FEAT-003 — Client authentication management
@@ -428,6 +480,13 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 **Acceptance Criteria:** AC-013 to AC-018  
 **Depends on:** FEAT-002
 
+### FEAT-039 — Client pending I/O management (PendingIOManager)
+
+**Related Elements:** `client_subsystem.mmd`  
+**Tasks:** T-179 to T-181  
+**Acceptance Criteria:** AC-207 to AC-212  
+**Depends on:** FEAT-002
+
 ### FEAT-005 — Channel entity and ChannelRegistry
 
 **Related Elements:** `channel_subsystem.mmd`  
@@ -435,19 +494,40 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 **Acceptance Criteria:** AC-019 to AC-024  
 **Depends on:** FEAT-001
 
+### FEAT-041 — Channel membership and settings management (ChannelMembershipManager, ChannelSettingsManager)
+
+**Related Elements:** `channel_subsystem.mmd`  
+**Tasks:** T-185 to T-190  
+**Acceptance Criteria:** AC-218 to AC-226  
+**Depends on:** FEAT-002, FEAT-005
+
+### FEAT-042 — Channel broadcast management (ChannelBroadcastManager)
+
+**Related Elements:** `channel_subsystem.mmd`, `client_subsystem.mmd`  
+**Tasks:** T-191 to T-193  
+**Acceptance Criteria:** AC-227 to AC-231  
+**Depends on:** FEAT-005, FEAT-039
+
 ### FEAT-006 — Channel management (ChannelSystem)
 
 **Related Elements:** `channel_subsystem.mmd`  
 **Tasks:** T-025 to T-027  
-**Acceptance Criteria:** AC-025 to AC-030  
-**Depends on:** FEAT-005, FEAT-002
+**Acceptance Criteria:** AC-025 to AC-233  
+**Depends on:** FEAT-005, FEAT-041, FEAT-042
+
+### FEAT-040 — Client lifecycle management (ClientLifecycleManager)
+
+**Related Elements:** `client_subsystem.mmd`, `channel_subsystem.mmd`  
+**Tasks:** T-182 to T-184  
+**Acceptance Criteria:** AC-213 to AC-217  
+**Depends on:** FEAT-002, FEAT-003, FEAT-004, FEAT-039, FEAT-041
 
 ### FEAT-007 — Client management (ClientSystem)
 
 **Related Elements:** `client_subsystem.mmd`  
 **Tasks:** T-028 to T-030  
-**Acceptance Criteria:** AC-031 to AC-035  
-**Depends on:** FEAT-004, FEAT-003, FEAT-006, FEAT-002
+**Acceptance Criteria:** AC-031 to AC-206  
+**Depends on:** FEAT-002, FEAT-003, FEAT-004, FEAT-039, FEAT-040
 
 ### FEAT-008 — IRCDto
 
@@ -662,9 +742,13 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 | FEAT-002 | FEAT-001 |
 | FEAT-003 | FEAT-002 |
 | FEAT-004 | FEAT-002 |
+| FEAT-039 | FEAT-002 |
 | FEAT-005 | FEAT-001 |
-| FEAT-006 | FEAT-005, FEAT-002 |
-| FEAT-007 | FEAT-004, FEAT-003, FEAT-006, FEAT-002 |
+| FEAT-041 | FEAT-002, FEAT-005 |
+| FEAT-042 | FEAT-005, FEAT-039 |
+| FEAT-006 | FEAT-005, FEAT-041, FEAT-042 |
+| FEAT-040 | FEAT-002, FEAT-003, FEAT-004, FEAT-039, FEAT-041 |
+| FEAT-007 | FEAT-002, FEAT-003, FEAT-004, FEAT-039, FEAT-040 |
 | FEAT-008 | None |
 | FEAT-009 | FEAT-001, FEAT-007, FEAT-006 |
 | FEAT-010 | FEAT-001, FEAT-007, FEAT-006, FEAT-009 |
