@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
+- [9b11083](https://github.com/LuisGrigore/ft_irc/commit/9b11083ba427cc57e7ed8670fdbcfdea54ed1458) implement RegistrationManager Closes #16 (**FEAT-004**) [Closes #16](https://github.com/LuisGrigore/ft_irc/issues/16)
+- [05c2532](https://github.com/LuisGrigore/ft_irc/commit/05c253263857975566a69b76635313c6a99d473c) implemented NickManager (**FEAT-004**)
 - [ed8752b](https://github.com/LuisGrigore/ft_irc/commit/ed8752b285857b8620cb086b33f57bdc9a5ab552) implemented AuthenticationManager Closes #12 (**FEAT-003**) [Closes #12](https://github.com/LuisGrigore/ft_irc/issues/12)
 - [8cece78](https://github.com/LuisGrigore/ft_irc/commit/8cece7866bad86a45c5faedfded8375aedf64a60) implement Client and ClientRegistry classes Closes #5 (**FEAT-002**) [Closes #5](https://github.com/LuisGrigore/ft_irc/issues/5)
 - [7c60ba5](https://github.com/LuisGrigore/ft_irc/commit/7c60ba59dd2718aeda7b60a62ea3ed8a72174661) implemented base and irc exceptions Closes #1 (**FEAT-001**) [Closes #1](https://github.com/LuisGrigore/ft_irc/issues/1)
@@ -25,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Chore
 
+- [e31f707](https://github.com/LuisGrigore/ft_irc/commit/e31f70749addaa68392f9e2413ae1164253e01da) update changelog
 - [cc709d5](https://github.com/LuisGrigore/ft_irc/commit/cc709d5407b2f8cb4574f7532418633f325ef2ba) update changelog
 - [bca3e93](https://github.com/LuisGrigore/ft_irc/commit/bca3e93bd911eb78e6af5b506bc9e10d2166ad29) update changelog
 
