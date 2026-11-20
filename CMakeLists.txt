@@ -72,6 +72,8 @@ add_library(ft_irc STATIC
 src/Client.cpp 
 src/ClientRegistry.cpp 
 src/AuthenticationManager.cpp
+src/NickManager.cpp
+src/RegistrationManager.cpp
 )
 target_include_directories(ft_irc PUBLIC include)
 target_compile_options(ft_irc PRIVATE ${PROJECT_WARNING_FLAGS})
