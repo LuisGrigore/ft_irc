@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Generated from commit range: `HEAD`
 
+### Features
 
+- [7c60ba5](https://github.com/LuisGrigore/ft_irc/commit/7c60ba59dd2718aeda7b60a62ea3ed8a72174661) implemented base and irc exceptions Closes #1 (**FEAT-001**) [Closes #1](https://github.com/LuisGrigore/ft_irc/issues/1)
 
 ### Devops
 
