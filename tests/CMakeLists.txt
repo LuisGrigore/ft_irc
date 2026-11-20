@@ -16,9 +16,10 @@ set(PROJECT_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
 add_executable(unit_tests test_main.cpp 
 unit/test_Client.cpp 
-unit/test_ClientRegistry 
-unit/test_AuthenticationManager 
-unit/test_NickManager 
+unit/test_ClientRegistry.cpp 
+unit/test_AuthenticationManager.cpp 
+unit/test_NickManager.cpp 
+unit/test_RegistrationManager.cpp 
 )
 target_link_libraries(unit_tests PRIVATE ft_irc CppUTestExt CppUTest)
 target_include_directories(unit_tests PRIVATE ${PROJECT_INCLUDE_DIRS})
@@ -42,9 +43,10 @@ endif()
 set_source_files_properties(
     test_main.cpp
 	unit/test_Client.cpp
-	unit/test_ClientRegistry
-	unit/test_AuthenticationManager
-	unit/test_NickManager
+	unit/test_ClientRegistry.cpp
+	unit/test_AuthenticationManager.cpp
+	unit/test_NickManager.cpp
+	unit/test_RegistrationManager.cpp
     PROPERTIES
     COMPILE_FLAGS "-isystem ${cpputest_SOURCE_DIR}/include -isystem ${cpputest_SOURCE_DIR}/CppUTestExt/include"
 )
