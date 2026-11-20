@@ -23,10 +23,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Hotfixes
 
+- [6f8636a](https://github.com/LuisGrigore/ft_irc/commit/6f8636a7796539b7ba54632c4541ea98ade573f1) fixed implementation plan and deleted obsolete documentation
 - [4da1ec4](https://github.com/LuisGrigore/ft_irc/commit/4da1ec4e12070165b361a1791e2b2fd287686900) updated implementation_plan.md with script (**HOTFIX-001**)
 
 ### Chore
 
+- [9beeaf5](https://github.com/LuisGrigore/ft_irc/commit/9beeaf57ce6cfba08d0188b07d456113e620a267) update changelog
 - [e31f707](https://github.com/LuisGrigore/ft_irc/commit/e31f70749addaa68392f9e2413ae1164253e01da) update changelog
 - [cc709d5](https://github.com/LuisGrigore/ft_irc/commit/cc709d5407b2f8cb4574f7532418633f325ef2ba) update changelog
 - [bca3e93](https://github.com/LuisGrigore/ft_irc/commit/bca3e93bd911eb78e6af5b506bc9e10d2166ad29) update changelog
