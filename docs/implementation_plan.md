@@ -10,40 +10,40 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 |----|------|------------------|
 | FEAT-001 | BaseException and Business exceptions (one per IRC error code) | None |
 | FEAT-002 | Client entity and ClientRegistry | None |
-| FEAT-003 | Client authentication management | `irc_registration.mmd` |
-| FEAT-004 | Client registration management | `irc_registration.mmd` |
-| FEAT-005 | Channel entity and ChannelRegistry | `irc_channels.mmd` |
-| FEAT-006 | Channel management (ChannelSystem) | `irc_channels.mmd` |
-| FEAT-007 | Client management (ClientSystem) | `irc_clients.mmd` |
+| FEAT-003 | Client authentication management | `client_subsystem.mmd` |
+| FEAT-004 | Client registration management | `client_subsystem.mmd` |
+| FEAT-005 | Channel entity and ChannelRegistry | `channel_subsystem.mmd` |
+| FEAT-006 | Channel management (ChannelSystem) | `channel_subsystem.mmd` |
+| FEAT-007 | Client management (ClientSystem) | `client_subsystem.mmd` |
 | FEAT-008 | IRCDto | None |
-| FEAT-009 | ISecurityFilter and SecurityFilterFactory | `irc_registration.mmd` |
-| FEAT-010 | ICommand and CommandFactory | `irc_commands.mmd` |
-| FEAT-011 | Command Parser | `irc_commands.mmd` |
-| FEAT-012 | Command management (CommandSystem) | `irc_commands.mmd` |
-| FEAT-013 | ISocketService | `irc_network_layer_pull.mmd` |
-| FEAT-014 | Socket server | `irc_network_layer_pull.mmd` |
-| FEAT-015 | IRCService | `irc_network_layer_pull.mmd` |
-| FEAT-016 | PASS command | `irc_registration.mmd` |
+| FEAT-009 | ISecurityFilter and SecurityFilterFactory | `security_filtering.mmd` |
+| FEAT-010 | ICommand and CommandFactory | `command_subsystem.mmd` |
+| FEAT-011 | Command Parser | `command_subsystem.mmd` |
+| FEAT-012 | Command management (CommandSystem) | `command_subsystem.mmd` |
+| FEAT-013 | ISocketService | `server.mmd` |
+| FEAT-014 | Socket server | `server.mmd` |
+| FEAT-015 | IRCService | `server.mmd` |
+| FEAT-016 | PASS command | `client_subsystem.mmd` |
 | FEAT-017 | QUIT command | None |
 | FEAT-018 | PING command | None |
-| FEAT-019 | AuthenticatedFilter | `irc_registration.mmd` |
-| FEAT-020 | NICK command | `irc_registration.mmd` |
-| FEAT-021 | USER command | `irc_registration.mmd` |
-| FEAT-022 | RegisteredFilter | `irc_registration.mmd` |
-| FEAT-023 | ChainFilter | `irc_registration.mmd` |
-| FEAT-024 | getCommonAccessFilter in factory | `irc_registration.mmd` |
-| FEAT-025 | JOIN command | `irc_channels.mmd` |
-| FEAT-026 | LIST command | `irc_channels.mmd` |
-| FEAT-027 | ChannelMemberFilter | `irc_channels.mmd` |
-| FEAT-028 | getChannelCommonAccessFilter in factory | `irc_channels.mmd` |
-| FEAT-029 | PRIVMSG command | `irc_commands.mmd` |
-| FEAT-030 | PART command | `irc_channels.mmd` |
-| FEAT-031 | ChannelOperatorFilter | `irc_channels.mmd` |
-| FEAT-032 | getChannelOperatorAccessFilter in factory | `irc_channels.mmd` |
-| FEAT-033 | KICK command | `irc_channels.mmd` |
-| FEAT-034 | MODE command | `irc_channels.mmd` |
-| FEAT-035 | TOPIC command | `irc_channels.mmd` |
-| FEAT-036 | INVITE command | `irc_channels.mmd` |
+| FEAT-019 | AuthenticatedFilter | `security_filtering.mmd` |
+| FEAT-020 | NICK command | `client_subsystem.mmd` |
+| FEAT-021 | USER command | `client_subsystem.mmd` |
+| FEAT-022 | RegisteredFilter | `security_filtering.mmd` |
+| FEAT-023 | ChainFilter | `security_filtering.mmd` |
+| FEAT-024 | getCommonAccessFilter in factory | `client_subsystem.mmd` |
+| FEAT-025 | JOIN command | `channel_subsystem.mmd` |
+| FEAT-026 | LIST command | `channel_subsystem.mmd` |
+| FEAT-027 | ChannelMemberFilter | `security_filtering.mmd` |
+| FEAT-028 | getChannelCommonAccessFilter in factory | `channel_subsystem.mmd` |
+| FEAT-029 | PRIVMSG command | `command_subsystem.mmd` |
+| FEAT-030 | PART command | `channel_subsystem.mmd` |
+| FEAT-031 | ChannelOperatorFilter | `security_filtering.mmd` |
+| FEAT-032 | getChannelOperatorAccessFilter in factory | `channel_subsystem.mmd` |
+| FEAT-033 | KICK command | `channel_subsystem.mmd` |
+| FEAT-034 | MODE command | `channel_subsystem.mmd` |
+| FEAT-035 | TOPIC command | `channel_subsystem.mmd` |
+| FEAT-036 | INVITE command | `channel_subsystem.mmd` |
 
 ---
 
@@ -61,7 +61,7 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 | T-008 | Implement ClientRegistry | — | FEAT-002 | None |
 | T-009 | Refactor ClientRegistry | — | FEAT-002 | None |
 | T-010 | Tests AuthenticationManager | — | FEAT-003 | None |
-| T-011 |  | — | FEAT-003 | `irc_registration.mmd` |
+| T-011 |  | — | FEAT-003 | `client_subsystem.mmd` |
 | T-012 | Refactor AuthenticationManager | — | FEAT-003 | None |
 | T-013 | Tests NickManager | — | FEAT-004 | None |
 | T-014 | Implement NickManager | — | FEAT-004 | None |
@@ -93,138 +93,138 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 | T-040 | Tests CommandParser | — | FEAT-011 | None |
 | T-041 | Implement CommandParser | — | FEAT-011 | None |
 | T-042 | Refactor CommandParser | — | FEAT-011 | None |
-| T-043 | Tests Command System | Red | FEAT-012 | `irc_commands.mmd` |
-| T-044 | Implement Command System | Green | FEAT-012 | `irc_commands.mmd` |
-| T-045 | Refactor Command System | Refactor | FEAT-012 | `irc_commands.mmd` |
-| T-046 | Tests TickResult | Red | FEAT-013 | `irc_network_layer_pull.mmd` |
-| T-047 | Implement TickResult | Green | FEAT-013 | `irc_network_layer_pull.mmd` |
-| T-048 | Refactor TickResult | Refactor | FEAT-013 | `irc_network_layer_pull.mmd` |
-| T-049 | Tests ISocketService | Red | FEAT-013 | `irc_network_layer_pull.mmd` |
-| T-050 | Implement ISocketService | Green | FEAT-013 | `irc_network_layer_pull.mmd` |
-| T-051 | Refactor ISocketService | Refactor | FEAT-013 | `irc_network_layer_pull.mmd` |
-| T-052 | Tests SocketServer | Red | FEAT-014 | `irc_network_layer_pull.mmd` |
-| T-053 | Implement SocketServer | Green | FEAT-014 | `irc_network_layer_pull.mmd` |
-| T-054 | Refactor SocketServer | Refactor | FEAT-014 | `irc_network_layer_pull.mmd` |
-| T-055 | Tests IRCService | Red | FEAT-015 | `irc_network_layer_pull.mmd` |
-| T-056 | Implement IRCService | Green | FEAT-015 | `irc_network_layer_pull.mmd` |
-| T-057 | Refactor IRCService | Refactor | FEAT-015 | `irc_network_layer_pull.mmd` |
-| T-058 | Tests PASS command | Red | FEAT-016 | `irc_registration.mmd` |
-| T-059 | Implement PASS command | Green | FEAT-016 | `irc_registration.mmd` |
-| T-060 | Refactor PASS command | Refactor | FEAT-016 | `irc_registration.mmd` |
-| T-061 | Tests PASS command in CommandFactory | Red | FEAT-016 | `irc_commands.mmd` |
-| T-062 | Implement PASS command in CommandFactory | Green | FEAT-016 | `irc_commands.mmd` |
-| T-063 | Refactor PASS command in CommandFactory | Refactor | FEAT-016 | `irc_commands.mmd` |
+| T-043 | Tests Command System | Red | FEAT-012 | `command_subsystem.mmd` |
+| T-044 | Implement Command System | Green | FEAT-012 | `command_subsystem.mmd` |
+| T-045 | Refactor Command System | Refactor | FEAT-012 | `command_subsystem.mmd` |
+| T-046 | Tests TickResult | Red | FEAT-013 | `server.mmd` |
+| T-047 | Implement TickResult | Green | FEAT-013 | `server.mmd` |
+| T-048 | Refactor TickResult | Refactor | FEAT-013 | `server.mmd` |
+| T-049 | Tests ISocketService | Red | FEAT-013 | `server.mmd` |
+| T-050 | Implement ISocketService | Green | FEAT-013 | `server.mmd` |
+| T-051 | Refactor ISocketService | Refactor | FEAT-013 | `server.mmd` |
+| T-052 | Tests SocketServer | Red | FEAT-014 | `server.mmd` |
+| T-053 | Implement SocketServer | Green | FEAT-014 | `server.mmd` |
+| T-054 | Refactor SocketServer | Refactor | FEAT-014 | `server.mmd` |
+| T-055 | Tests IRCService | Red | FEAT-015 | `server.mmd` |
+| T-056 | Implement IRCService | Green | FEAT-015 | `server.mmd` |
+| T-057 | Refactor IRCService | Refactor | FEAT-015 | `server.mmd` |
+| T-058 | Tests PASS command | Red | FEAT-016 | `client_subsystem.mmd` |
+| T-059 | Implement PASS command | Green | FEAT-016 | `client_subsystem.mmd` |
+| T-060 | Refactor PASS command | Refactor | FEAT-016 | `client_subsystem.mmd` |
+| T-061 | Tests PASS command in CommandFactory | Red | FEAT-016 | `command_subsystem.mmd` |
+| T-062 | Implement PASS command in CommandFactory | Green | FEAT-016 | `command_subsystem.mmd` |
+| T-063 | Refactor PASS command in CommandFactory | Refactor | FEAT-016 | `command_subsystem.mmd` |
 | T-064 | Tests QUIT command | Red | FEAT-017 | None |
 | T-065 | Implement QUIT command | Green | FEAT-017 | None |
 | T-066 | Refactor QUIT command | Refactor | FEAT-017 | None |
-| T-067 | Tests QUIT command in CommandFactory | Red | FEAT-017 | `irc_commands.mmd` |
-| T-068 | Implement QUIT command in CommandFactory | Green | FEAT-017 | `irc_commands.mmd` |
-| T-069 | Refactor QUIT command in CommandFactory | Refactor | FEAT-017 | `irc_commands.mmd` |
+| T-067 | Tests QUIT command in CommandFactory | Red | FEAT-017 | `command_subsystem.mmd` |
+| T-068 | Implement QUIT command in CommandFactory | Green | FEAT-017 | `command_subsystem.mmd` |
+| T-069 | Refactor QUIT command in CommandFactory | Refactor | FEAT-017 | `command_subsystem.mmd` |
 | T-070 | Tests PING command | Red | FEAT-018 | None |
 | T-071 | Implement PING command | Green | FEAT-018 | None |
 | T-072 | Refactor PING command | Refactor | FEAT-018 | None |
-| T-073 | Tests PING command in CommandFactory | Red | FEAT-018 | `irc_commands.mmd` |
-| T-074 | Implement PING command in CommandFactory | Green | FEAT-018 | `irc_commands.mmd` |
-| T-075 | Refactor PING command in CommandFactory | Refactor | FEAT-018 | `irc_commands.mmd` |
-| T-076 | Tests AuthenticatedFilter | Red | FEAT-019 | `irc_registration.mmd` |
-| T-077 | Implement AuthenticatedFilter | Green | FEAT-019 | `irc_registration.mmd` |
-| T-078 | Refactor AuthenticatedFilter | Refactor | FEAT-019 | `irc_registration.mmd` |
-| T-079 | Tests AuthenticatedFilter in SecurityFilterFactory | Red | FEAT-019 | `irc_registration.mmd` |
-| T-080 | Implement AuthenticatedFilter in SecurityFilterFactory | Green | FEAT-019 | `irc_registration.mmd` |
-| T-081 | Refactor AuthenticatedFilter in SecurityFilterFactory | Refactor | FEAT-019 | `irc_registration.mmd` |
-| T-082 | Tests NICK command | Red | FEAT-020 | `irc_registration.mmd` |
-| T-083 | Implement NICK command | Green | FEAT-020 | `irc_registration.mmd` |
-| T-084 | Refactor NICK command | Refactor | FEAT-020 | `irc_registration.mmd` |
-| T-085 | Tests NICK command in CommandFactory | Red | FEAT-020 | `irc_commands.mmd` |
-| T-086 | Implement NICK command in CommandFactory | Green | FEAT-020 | `irc_commands.mmd` |
-| T-087 | Refactor NICK command in CommandFactory | Refactor | FEAT-020 | `irc_commands.mmd` |
-| T-088 | Tests USER command | Red | FEAT-021 | `irc_registration.mmd` |
-| T-089 | Implement USER command | Green | FEAT-021 | `irc_registration.mmd` |
-| T-090 | Refactor USER command | Refactor | FEAT-021 | `irc_registration.mmd` |
-| T-091 | Tests USER command in CommandFactory | Red | FEAT-021 | `irc_commands.mmd` |
-| T-092 | Implement USER command in CommandFactory | Green | FEAT-021 | `irc_commands.mmd` |
-| T-093 | Refactor USER command in CommandFactory | Refactor | FEAT-021 | `irc_commands.mmd` |
-| T-094 | Tests RegisteredFilter | Red | FEAT-022 | `irc_registration.mmd` |
-| T-095 | Implement RegisteredFilter | Green | FEAT-022 | `irc_registration.mmd` |
-| T-096 | Refactor RegisteredFilter | Refactor | FEAT-022 | `irc_registration.mmd` |
-| T-097 | Tests RegisteredFilter in SecurityFilterFactory | Red | FEAT-022 | `irc_registration.mmd` |
-| T-098 | Implement RegisteredFilter in SecurityFilterFactory | Green | FEAT-022 | `irc_registration.mmd` |
-| T-099 | Refactor RegisteredFilter in SecurityFilterFactory | Refactor | FEAT-022 | `irc_registration.mmd` |
-| T-100 | Tests ChainFilter | Red | FEAT-023 | `irc_registration.mmd` |
-| T-101 | Implement ChainFilter | Green | FEAT-023 | `irc_registration.mmd` |
-| T-102 | Refactor ChainFilter | Refactor | FEAT-023 | `irc_registration.mmd` |
-| T-103 | Tests ChainFilter in SecurityFilterFactory | Red | FEAT-023 | `irc_registration.mmd` |
-| T-104 | Implement ChainFilter in SecurityFilterFactory | Green | FEAT-023 | `irc_registration.mmd` |
-| T-105 | Refactor ChainFilter in SecurityFilterFactory | Refactor | FEAT-023 | `irc_registration.mmd` |
-| T-106 | Tests getCommonAccessFilter in SecurityFilterFactory | Red | FEAT-024 | `irc_registration.mmd` |
-| T-107 | Implement getCommonAccessFilter in SecurityFilterFactory | Green | FEAT-024 | `irc_registration.mmd` |
-| T-108 | Refactor getCommonAccessFilter in SecurityFilterFactory | Refactor | FEAT-024 | `irc_registration.mmd` |
-| T-109 | Tests JOIN command | Red | FEAT-025 | `irc_channels.mmd` |
-| T-110 | Implement JOIN command | Green | FEAT-025 | `irc_channels.mmd` |
-| T-111 | Refactor JOIN command | Refactor | FEAT-025 | `irc_channels.mmd` |
-| T-112 | Tests JOIN command in CommandFactory | Red | FEAT-025 | `irc_commands.mmd` |
-| T-113 | Implement JOIN command in CommandFactory | Green | FEAT-025 | `irc_commands.mmd` |
-| T-114 | Refactor JOIN command in CommandFactory | Refactor | FEAT-025 | `irc_commands.mmd` |
-| T-115 | Tests LIST command | Red | FEAT-026 | `irc_channels.mmd` |
-| T-116 | Implement LIST command | Green | FEAT-026 | `irc_channels.mmd` |
-| T-117 | Refactor LIST command | Refactor | FEAT-026 | `irc_channels.mmd` |
-| T-118 | Tests LIST command in CommandFactory | Red | FEAT-026 | `irc_commands.mmd` |
-| T-119 | Implement LIST command in CommandFactory | Green | FEAT-026 | `irc_commands.mmd` |
-| T-120 | Refactor LIST command in CommandFactory | Refactor | FEAT-026 | `irc_commands.mmd` |
-| T-121 | Tests ChannelMemberFilter | Red | FEAT-027 | `irc_channels.mmd` |
-| T-122 | Implement ChannelMemberFilter | Green | FEAT-027 | `irc_channels.mmd` |
-| T-123 | Refactor ChannelMemberFilter | Refactor | FEAT-027 | `irc_channels.mmd` |
-| T-124 | Tests ChannelMemberFilter in SecurityFilterFactory | Red | FEAT-027 | `irc_channels.mmd` |
-| T-125 | Implement ChannelMemberFilter in SecurityFilterFactory | Green | FEAT-027 | `irc_channels.mmd` |
-| T-126 | Refactor ChannelMemberFilter in SecurityFilterFactory | Refactor | FEAT-027 | `irc_channels.mmd` |
-| T-127 | Tests getChannelCommonAccessFilter in SecurityFilterFactory | Red | FEAT-028 | `irc_channels.mmd` |
-| T-128 | Implement getChannelCommonAccessFilter in SecurityFilterFactory | Green | FEAT-028 | `irc_channels.mmd` |
-| T-129 | Refactor getChannelCommonAccessFilter in SecurityFilterFactory | Refactor | FEAT-028 | `irc_channels.mmd` |
-| T-130 | Tests PRIVMSG command | Red | FEAT-029 | `irc_commands.mmd` |
-| T-131 | Implement PRIVMSG command | Green | FEAT-029 | `irc_commands.mmd` |
-| T-132 | Refactor PRIVMSG command | Refactor | FEAT-029 | `irc_commands.mmd` |
-| T-133 | Tests PRIVMSG command in CommandFactory | Red | FEAT-029 | `irc_commands.mmd` |
-| T-134 | Implement PRIVMSG command in CommandFactory | Green | FEAT-029 | `irc_commands.mmd` |
-| T-135 | Refactor PRIVMSG command in CommandFactory | Refactor | FEAT-029 | `irc_commands.mmd` |
-| T-136 | Tests PART command | Red | FEAT-030 | `irc_channels.mmd` |
-| T-137 | Implement PART command | Green | FEAT-030 | `irc_channels.mmd` |
-| T-138 | Refactor PART command | Refactor | FEAT-030 | `irc_channels.mmd` |
-| T-139 | Tests PART command in CommandFactory | Red | FEAT-030 | `irc_commands.mmd` |
-| T-140 | Implement PART command in CommandFactory | Green | FEAT-030 | `irc_commands.mmd` |
-| T-141 | Refactor PART command in CommandFactory | Refactor | FEAT-030 | `irc_commands.mmd` |
-| T-142 | Tests ChannelOperatorFilter | Red | FEAT-031 | `irc_channels.mmd` |
-| T-143 | Implement ChannelOperatorFilter | Green | FEAT-031 | `irc_channels.mmd` |
-| T-144 | Refactor ChannelOperatorFilter | Refactor | FEAT-031 | `irc_channels.mmd` |
-| T-145 | Tests ChannelOperatorFilter in SecurityFilterFactory | Red | FEAT-031 | `irc_channels.mmd` |
-| T-146 | Implement ChannelOperatorFilter in SecurityFilterFactory | Green | FEAT-031 | `irc_channels.mmd` |
-| T-147 | Refactor ChannelOperatorFilter in SecurityFilterFactory | Refactor | FEAT-031 | `irc_channels.mmd` |
-| T-148 | Tests getChannelOperatorAccessFilter in SecurityFilterFactory | Red | FEAT-032 | `irc_channels.mmd` |
-| T-149 | Implement getChannelOperatorAccessFilter in SecurityFilterFactory | Green | FEAT-032 | `irc_channels.mmd` |
-| T-150 | Refactor getChannelOperatorAccessFilter in SecurityFilterFactory | Refactor | FEAT-032 | `irc_channels.mmd` |
-| T-151 | Tests KICK command | Red | FEAT-033 | `irc_channels.mmd` |
-| T-152 | Implement KICK command | Green | FEAT-033 | `irc_channels.mmd` |
-| T-153 | Refactor KICK command | Refactor | FEAT-033 | `irc_channels.mmd` |
-| T-154 | Tests KICK command in CommandFactory | Red | FEAT-033 | `irc_commands.mmd` |
-| T-155 | Implement KICK command in CommandFactory | Green | FEAT-033 | `irc_commands.mmd` |
-| T-156 | Refactor KICK command in CommandFactory | Refactor | FEAT-033 | `irc_commands.mmd` |
-| T-157 | Tests MODE command | Red | FEAT-034 | `irc_channels.mmd` |
-| T-158 | Implement MODE command | Green | FEAT-034 | `irc_channels.mmd` |
-| T-159 | Refactor MODE command | Refactor | FEAT-034 | `irc_channels.mmd` |
-| T-160 | Tests MODE command in CommandFactory | Red | FEAT-034 | `irc_commands.mmd` |
-| T-161 | Implement MODE command in CommandFactory | Green | FEAT-034 | `irc_commands.mmd` |
-| T-162 | Refactor MODE command in CommandFactory | Refactor | FEAT-034 | `irc_commands.mmd` |
-| T-163 | Tests TOPIC command | Red | FEAT-035 | `irc_channels.mmd` |
-| T-164 | Implement TOPIC command | Green | FEAT-035 | `irc_channels.mmd` |
-| T-165 | Refactor TOPIC command | Refactor | FEAT-035 | `irc_channels.mmd` |
-| T-166 | Tests TOPIC command in CommandFactory | Red | FEAT-035 | `irc_commands.mmd` |
-| T-167 | Implement TOPIC command in CommandFactory | Green | FEAT-035 | `irc_commands.mmd` |
-| T-168 | Refactor TOPIC command in CommandFactory | Refactor | FEAT-035 | `irc_commands.mmd` |
-| T-169 | Tests INVITE command | Red | FEAT-036 | `irc_channels.mmd` |
-| T-170 | Implement INVITE command | Green | FEAT-036 | `irc_channels.mmd` |
-| T-171 | Refactor INVITE command | Refactor | FEAT-036 | `irc_channels.mmd` |
-| T-172 | Tests INVITE command in CommandFactory | Red | FEAT-036 | `irc_commands.mmd` |
-| T-173 | Implement INVITE command in CommandFactory | Green | FEAT-036 | `irc_commands.mmd` |
-| T-174 | Refactor INVITE command in CommandFactory | Refactor | FEAT-036 | `irc_commands.mmd` |
+| T-073 | Tests PING command in CommandFactory | Red | FEAT-018 | `command_subsystem.mmd` |
+| T-074 | Implement PING command in CommandFactory | Green | FEAT-018 | `command_subsystem.mmd` |
+| T-075 | Refactor PING command in CommandFactory | Refactor | FEAT-018 | `command_subsystem.mmd` |
+| T-076 | Tests AuthenticatedFilter | Red | FEAT-019 | `client_subsystem.mmd` |
+| T-077 | Implement AuthenticatedFilter | Green | FEAT-019 | `client_subsystem.mmd` |
+| T-078 | Refactor AuthenticatedFilter | Refactor | FEAT-019 | `client_subsystem.mmd` |
+| T-079 | Tests AuthenticatedFilter in SecurityFilterFactory | Red | FEAT-019 | `client_subsystem.mmd` |
+| T-080 | Implement AuthenticatedFilter in SecurityFilterFactory | Green | FEAT-019 | `client_subsystem.mmd` |
+| T-081 | Refactor AuthenticatedFilter in SecurityFilterFactory | Refactor | FEAT-019 | `client_subsystem.mmd` |
+| T-082 | Tests NICK command | Red | FEAT-020 | `client_subsystem.mmd` |
+| T-083 | Implement NICK command | Green | FEAT-020 | `client_subsystem.mmd` |
+| T-084 | Refactor NICK command | Refactor | FEAT-020 | `client_subsystem.mmd` |
+| T-085 | Tests NICK command in CommandFactory | Red | FEAT-020 | `command_subsystem.mmd` |
+| T-086 | Implement NICK command in CommandFactory | Green | FEAT-020 | `command_subsystem.mmd` |
+| T-087 | Refactor NICK command in CommandFactory | Refactor | FEAT-020 | `command_subsystem.mmd` |
+| T-088 | Tests USER command | Red | FEAT-021 | `client_subsystem.mmd` |
+| T-089 | Implement USER command | Green | FEAT-021 | `client_subsystem.mmd` |
+| T-090 | Refactor USER command | Refactor | FEAT-021 | `client_subsystem.mmd` |
+| T-091 | Tests USER command in CommandFactory | Red | FEAT-021 | `command_subsystem.mmd` |
+| T-092 | Implement USER command in CommandFactory | Green | FEAT-021 | `command_subsystem.mmd` |
+| T-093 | Refactor USER command in CommandFactory | Refactor | FEAT-021 | `command_subsystem.mmd` |
+| T-094 | Tests RegisteredFilter | Red | FEAT-022 | `client_subsystem.mmd` |
+| T-095 | Implement RegisteredFilter | Green | FEAT-022 | `client_subsystem.mmd` |
+| T-096 | Refactor RegisteredFilter | Refactor | FEAT-022 | `client_subsystem.mmd` |
+| T-097 | Tests RegisteredFilter in SecurityFilterFactory | Red | FEAT-022 | `client_subsystem.mmd` |
+| T-098 | Implement RegisteredFilter in SecurityFilterFactory | Green | FEAT-022 | `client_subsystem.mmd` |
+| T-099 | Refactor RegisteredFilter in SecurityFilterFactory | Refactor | FEAT-022 | `client_subsystem.mmd` |
+| T-100 | Tests ChainFilter | Red | FEAT-023 | `client_subsystem.mmd` |
+| T-101 | Implement ChainFilter | Green | FEAT-023 | `client_subsystem.mmd` |
+| T-102 | Refactor ChainFilter | Refactor | FEAT-023 | `client_subsystem.mmd` |
+| T-103 | Tests ChainFilter in SecurityFilterFactory | Red | FEAT-023 | `client_subsystem.mmd` |
+| T-104 | Implement ChainFilter in SecurityFilterFactory | Green | FEAT-023 | `client_subsystem.mmd` |
+| T-105 | Refactor ChainFilter in SecurityFilterFactory | Refactor | FEAT-023 | `client_subsystem.mmd` |
+| T-106 | Tests getCommonAccessFilter in SecurityFilterFactory | Red | FEAT-024 | `client_subsystem.mmd` |
+| T-107 | Implement getCommonAccessFilter in SecurityFilterFactory | Green | FEAT-024 | `client_subsystem.mmd` |
+| T-108 | Refactor getCommonAccessFilter in SecurityFilterFactory | Refactor | FEAT-024 | `client_subsystem.mmd` |
+| T-109 | Tests JOIN command | Red | FEAT-025 | `channel_subsystem.mmd` |
+| T-110 | Implement JOIN command | Green | FEAT-025 | `channel_subsystem.mmd` |
+| T-111 | Refactor JOIN command | Refactor | FEAT-025 | `channel_subsystem.mmd` |
+| T-112 | Tests JOIN command in CommandFactory | Red | FEAT-025 | `command_subsystem.mmd` |
+| T-113 | Implement JOIN command in CommandFactory | Green | FEAT-025 | `command_subsystem.mmd` |
+| T-114 | Refactor JOIN command in CommandFactory | Refactor | FEAT-025 | `command_subsystem.mmd` |
+| T-115 | Tests LIST command | Red | FEAT-026 | `channel_subsystem.mmd` |
+| T-116 | Implement LIST command | Green | FEAT-026 | `channel_subsystem.mmd` |
+| T-117 | Refactor LIST command | Refactor | FEAT-026 | `channel_subsystem.mmd` |
+| T-118 | Tests LIST command in CommandFactory | Red | FEAT-026 | `command_subsystem.mmd` |
+| T-119 | Implement LIST command in CommandFactory | Green | FEAT-026 | `command_subsystem.mmd` |
+| T-120 | Refactor LIST command in CommandFactory | Refactor | FEAT-026 | `command_subsystem.mmd` |
+| T-121 | Tests ChannelMemberFilter | Red | FEAT-027 | `channel_subsystem.mmd` |
+| T-122 | Implement ChannelMemberFilter | Green | FEAT-027 | `channel_subsystem.mmd` |
+| T-123 | Refactor ChannelMemberFilter | Refactor | FEAT-027 | `channel_subsystem.mmd` |
+| T-124 | Tests ChannelMemberFilter in SecurityFilterFactory | Red | FEAT-027 | `channel_subsystem.mmd` |
+| T-125 | Implement ChannelMemberFilter in SecurityFilterFactory | Green | FEAT-027 | `channel_subsystem.mmd` |
+| T-126 | Refactor ChannelMemberFilter in SecurityFilterFactory | Refactor | FEAT-027 | `channel_subsystem.mmd` |
+| T-127 | Tests getChannelCommonAccessFilter in SecurityFilterFactory | Red | FEAT-028 | `channel_subsystem.mmd` |
+| T-128 | Implement getChannelCommonAccessFilter in SecurityFilterFactory | Green | FEAT-028 | `channel_subsystem.mmd` |
+| T-129 | Refactor getChannelCommonAccessFilter in SecurityFilterFactory | Refactor | FEAT-028 | `channel_subsystem.mmd` |
+| T-130 | Tests PRIVMSG command | Red | FEAT-029 | `command_subsystem.mmd` |
+| T-131 | Implement PRIVMSG command | Green | FEAT-029 | `command_subsystem.mmd` |
+| T-132 | Refactor PRIVMSG command | Refactor | FEAT-029 | `command_subsystem.mmd` |
+| T-133 | Tests PRIVMSG command in CommandFactory | Red | FEAT-029 | `command_subsystem.mmd` |
+| T-134 | Implement PRIVMSG command in CommandFactory | Green | FEAT-029 | `command_subsystem.mmd` |
+| T-135 | Refactor PRIVMSG command in CommandFactory | Refactor | FEAT-029 | `command_subsystem.mmd` |
+| T-136 | Tests PART command | Red | FEAT-030 | `channel_subsystem.mmd` |
+| T-137 | Implement PART command | Green | FEAT-030 | `channel_subsystem.mmd` |
+| T-138 | Refactor PART command | Refactor | FEAT-030 | `channel_subsystem.mmd` |
+| T-139 | Tests PART command in CommandFactory | Red | FEAT-030 | `command_subsystem.mmd` |
+| T-140 | Implement PART command in CommandFactory | Green | FEAT-030 | `command_subsystem.mmd` |
+| T-141 | Refactor PART command in CommandFactory | Refactor | FEAT-030 | `command_subsystem.mmd` |
+| T-142 | Tests ChannelOperatorFilter | Red | FEAT-031 | `channel_subsystem.mmd` |
+| T-143 | Implement ChannelOperatorFilter | Green | FEAT-031 | `channel_subsystem.mmd` |
+| T-144 | Refactor ChannelOperatorFilter | Refactor | FEAT-031 | `channel_subsystem.mmd` |
+| T-145 | Tests ChannelOperatorFilter in SecurityFilterFactory | Red | FEAT-031 | `channel_subsystem.mmd` |
+| T-146 | Implement ChannelOperatorFilter in SecurityFilterFactory | Green | FEAT-031 | `channel_subsystem.mmd` |
+| T-147 | Refactor ChannelOperatorFilter in SecurityFilterFactory | Refactor | FEAT-031 | `channel_subsystem.mmd` |
+| T-148 | Tests getChannelOperatorAccessFilter in SecurityFilterFactory | Red | FEAT-032 | `channel_subsystem.mmd` |
+| T-149 | Implement getChannelOperatorAccessFilter in SecurityFilterFactory | Green | FEAT-032 | `channel_subsystem.mmd` |
+| T-150 | Refactor getChannelOperatorAccessFilter in SecurityFilterFactory | Refactor | FEAT-032 | `channel_subsystem.mmd` |
+| T-151 | Tests KICK command | Red | FEAT-033 | `channel_subsystem.mmd` |
+| T-152 | Implement KICK command | Green | FEAT-033 | `channel_subsystem.mmd` |
+| T-153 | Refactor KICK command | Refactor | FEAT-033 | `channel_subsystem.mmd` |
+| T-154 | Tests KICK command in CommandFactory | Red | FEAT-033 | `command_subsystem.mmd` |
+| T-155 | Implement KICK command in CommandFactory | Green | FEAT-033 | `command_subsystem.mmd` |
+| T-156 | Refactor KICK command in CommandFactory | Refactor | FEAT-033 | `command_subsystem.mmd` |
+| T-157 | Tests MODE command | Red | FEAT-034 | `channel_subsystem.mmd` |
+| T-158 | Implement MODE command | Green | FEAT-034 | `channel_subsystem.mmd` |
+| T-159 | Refactor MODE command | Refactor | FEAT-034 | `channel_subsystem.mmd` |
+| T-160 | Tests MODE command in CommandFactory | Red | FEAT-034 | `command_subsystem.mmd` |
+| T-161 | Implement MODE command in CommandFactory | Green | FEAT-034 | `command_subsystem.mmd` |
+| T-162 | Refactor MODE command in CommandFactory | Refactor | FEAT-034 | `command_subsystem.mmd` |
+| T-163 | Tests TOPIC command | Red | FEAT-035 | `channel_subsystem.mmd` |
+| T-164 | Implement TOPIC command | Green | FEAT-035 | `channel_subsystem.mmd` |
+| T-165 | Refactor TOPIC command | Refactor | FEAT-035 | `channel_subsystem.mmd` |
+| T-166 | Tests TOPIC command in CommandFactory | Red | FEAT-035 | `command_subsystem.mmd` |
+| T-167 | Implement TOPIC command in CommandFactory | Green | FEAT-035 | `command_subsystem.mmd` |
+| T-168 | Refactor TOPIC command in CommandFactory | Refactor | FEAT-035 | `command_subsystem.mmd` |
+| T-169 | Tests INVITE command | Red | FEAT-036 | `channel_subsystem.mmd` |
+| T-170 | Implement INVITE command | Green | FEAT-036 | `channel_subsystem.mmd` |
+| T-171 | Refactor INVITE command | Refactor | FEAT-036 | `channel_subsystem.mmd` |
+| T-172 | Tests INVITE command in CommandFactory | Red | FEAT-036 | `command_subsystem.mmd` |
+| T-173 | Implement INVITE command in CommandFactory | Green | FEAT-036 | `command_subsystem.mmd` |
+| T-174 | Refactor INVITE command in CommandFactory | Refactor | FEAT-036 | `command_subsystem.mmd` |
 
 ---
 
@@ -416,35 +416,35 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 
 ### FEAT-003 — Client authentication management
 
-**Related Elements:** `irc_registration.mmd`  
+**Related Elements:** `client_subsystem.mmd`  
 **Tasks:** T-010 to T-012  
 **Acceptance Criteria:** AC-009 to AC-012  
 **Depends on:** FEAT-002
 
 ### FEAT-004 — Client registration management
 
-**Related Elements:** `irc_registration.mmd`  
+**Related Elements:** `client_subsystem.mmd`  
 **Tasks:** T-013 to T-018  
 **Acceptance Criteria:** AC-013 to AC-018  
 **Depends on:** FEAT-002
 
 ### FEAT-005 — Channel entity and ChannelRegistry
 
-**Related Elements:** `irc_channels.mmd`  
+**Related Elements:** `channel_subsystem.mmd`  
 **Tasks:** T-019 to T-024  
 **Acceptance Criteria:** AC-019 to AC-024  
 **Depends on:** FEAT-001
 
 ### FEAT-006 — Channel management (ChannelSystem)
 
-**Related Elements:** `irc_channels.mmd`  
+**Related Elements:** `channel_subsystem.mmd`  
 **Tasks:** T-025 to T-027  
 **Acceptance Criteria:** AC-025 to AC-030  
 **Depends on:** FEAT-005, FEAT-002
 
 ### FEAT-007 — Client management (ClientSystem)
 
-**Related Elements:** `irc_clients.mmd`  
+**Related Elements:** `client_subsystem.mmd`  
 **Tasks:** T-028 to T-030  
 **Acceptance Criteria:** AC-031 to AC-035  
 **Depends on:** FEAT-004, FEAT-003, FEAT-006, FEAT-002
@@ -458,56 +458,56 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 
 ### FEAT-009 — ISecurityFilter and SecurityFilterFactory
 
-**Related Elements:** `irc_registration.mmd`  
+**Related Elements:** `security_filtering.mmd`  
 **Tasks:** T-032 to T-035  
 **Acceptance Criteria:** AC-038 to AC-041  
 **Depends on:** FEAT-001, FEAT-007, FEAT-006
 
 ### FEAT-010 — ICommand and CommandFactory
 
-**Related Elements:** `irc_commands.mmd`  
+**Related Elements:** `command_subsystem.mmd`  
 **Tasks:** T-036 to T-039  
 **Acceptance Criteria:** AC-042 to AC-045  
 **Depends on:** FEAT-001, FEAT-007, FEAT-006, FEAT-009
 
 ### FEAT-011 — Command Parser
 
-**Related Elements:** `irc_commands.mmd`  
+**Related Elements:** `command_subsystem.mmd`  
 **Tasks:** T-040 to T-042  
 **Acceptance Criteria:** AC-046 to AC-049  
 **Depends on:** FEAT-008, FEAT-001
 
 ### FEAT-012 — Command management (CommandSystem)
 
-**Related Elements:** `irc_commands.mmd`  
+**Related Elements:** `command_subsystem.mmd`  
 **Tasks:** T-043 to T-045  
 **Acceptance Criteria:** AC-050 to AC-054  
 **Depends on:** FEAT-010, FEAT-011
 
 ### FEAT-013 — ISocketService
 
-**Related Elements:** `irc_network_layer_pull.mmd`  
+**Related Elements:** `server.mmd`  
 **Tasks:** T-046 to T-051  
 **Acceptance Criteria:** AC-055 to AC-056  
 **Depends on:** None
 
 ### FEAT-014 — Socket server
 
-**Related Elements:** `irc_network_layer_pull.mmd`  
+**Related Elements:** `server.mmd`  
 **Tasks:** T-052 to T-054  
 **Acceptance Criteria:** AC-057 to AC-062  
 **Depends on:** FEAT-013, FEAT-001
 
 ### FEAT-015 — IRCService
 
-**Related Elements:** `irc_network_layer_pull.mmd`  
+**Related Elements:** `server.mmd`  
 **Tasks:** T-055 to T-057  
 **Acceptance Criteria:** AC-063 to AC-067  
 **Depends on:** FEAT-013, FEAT-012, FEAT-007, FEAT-006
 
 ### FEAT-016 — PASS command
 
-**Related Elements:** `irc_registration.mmd`  
+**Related Elements:** `client_subsystem.mmd`  
 **Tasks:** T-058 to T-063  
 **Acceptance Criteria:** AC-068 to AC-072  
 **Depends on:** FEAT-010, FEAT-007
@@ -528,126 +528,126 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 
 ### FEAT-019 — AuthenticatedFilter
 
-**Related Elements:** `irc_registration.mmd`  
+**Related Elements:** `security_filtering.mmd`  
 **Tasks:** T-076 to T-081  
 **Acceptance Criteria:** AC-082 to AC-085  
 **Depends on:** FEAT-009, FEAT-007
 
 ### FEAT-020 — NICK command
 
-**Related Elements:** `irc_registration.mmd`  
+**Related Elements:** `client_subsystem.mmd`  
 **Tasks:** T-082 to T-087  
 **Acceptance Criteria:** AC-086 to AC-090  
 **Depends on:** FEAT-010, FEAT-007, FEAT-019, FEAT-006
 
 ### FEAT-021 — USER command
 
-**Related Elements:** `irc_registration.mmd`  
+**Related Elements:** `client_subsystem.mmd`  
 **Tasks:** T-088 to T-093  
 **Acceptance Criteria:** AC-091 to AC-095  
 **Depends on:** FEAT-010, FEAT-007, FEAT-019
 
 ### FEAT-022 — RegisteredFilter
 
-**Related Elements:** `irc_registration.mmd`  
+**Related Elements:** `security_filtering.mmd`  
 **Tasks:** T-094 to T-099  
 **Acceptance Criteria:** AC-096 to AC-099  
 **Depends on:** FEAT-009, FEAT-007
 
 ### FEAT-023 — ChainFilter
 
-**Related Elements:** `irc_registration.mmd`  
+**Related Elements:** `security_filtering.mmd`  
 **Tasks:** T-100 to T-105  
 **Acceptance Criteria:** AC-100 to AC-104  
 **Depends on:** FEAT-009
 
 ### FEAT-024 — getCommonAccessFilter in factory
 
-**Related Elements:** `irc_registration.mmd`  
+**Related Elements:** `client_subsystem.mmd`  
 **Tasks:** T-106 to T-108  
 **Acceptance Criteria:** AC-105 to AC-108  
 **Depends on:** FEAT-023, FEAT-019, FEAT-022
 
 ### FEAT-025 — JOIN command
 
-**Related Elements:** `irc_channels.mmd`  
+**Related Elements:** `channel_subsystem.mmd`  
 **Tasks:** T-109 to T-114  
 **Acceptance Criteria:** AC-109 to AC-113  
 **Depends on:** FEAT-010, FEAT-007, FEAT-024, FEAT-006
 
 ### FEAT-026 — LIST command
 
-**Related Elements:** `irc_channels.mmd`  
+**Related Elements:** `channel_subsystem.mmd`  
 **Tasks:** T-115 to T-120  
 **Acceptance Criteria:** AC-114 to AC-117  
 **Depends on:** FEAT-010, FEAT-007, FEAT-024, FEAT-006
 
 ### FEAT-027 — ChannelMemberFilter
 
-**Related Elements:** `irc_channels.mmd`  
+**Related Elements:** `security_filtering.mmd`  
 **Tasks:** T-121 to T-126  
 **Acceptance Criteria:** AC-118 to AC-121  
 **Depends on:** FEAT-009, FEAT-007, FEAT-006
 
 ### FEAT-028 — getChannelCommonAccessFilter in factory
 
-**Related Elements:** `irc_channels.mmd`  
+**Related Elements:** `channel_subsystem.mmd`  
 **Tasks:** T-127 to T-129  
 **Acceptance Criteria:** AC-122 to AC-125  
 **Depends on:** FEAT-024, FEAT-027
 
 ### FEAT-029 — PRIVMSG command
 
-**Related Elements:** `irc_commands.mmd`  
+**Related Elements:** `command_subsystem.mmd`  
 **Tasks:** T-130 to T-135  
 **Acceptance Criteria:** AC-126 to AC-130  
 **Depends on:** FEAT-010, FEAT-007, FEAT-028, FEAT-006
 
 ### FEAT-030 — PART command
 
-**Related Elements:** `irc_channels.mmd`  
+**Related Elements:** `channel_subsystem.mmd`  
 **Tasks:** T-136 to T-141  
 **Acceptance Criteria:** AC-131 to AC-135  
 **Depends on:** FEAT-010, FEAT-007, FEAT-028, FEAT-006
 
 ### FEAT-031 — ChannelOperatorFilter
 
-**Related Elements:** `irc_channels.mmd`  
+**Related Elements:** `security_filtering.mmd`  
 **Tasks:** T-142 to T-147  
 **Acceptance Criteria:** AC-136 to AC-139  
 **Depends on:** FEAT-009, FEAT-007, FEAT-006
 
 ### FEAT-032 — getChannelOperatorAccessFilter in factory
 
-**Related Elements:** `irc_channels.mmd`  
+**Related Elements:** `channel_subsystem.mmd`  
 **Tasks:** T-148 to T-150  
 **Acceptance Criteria:** AC-140 to AC-143  
 **Depends on:** FEAT-028, FEAT-031
 
 ### FEAT-033 — KICK command
 
-**Related Elements:** `irc_channels.mmd`  
+**Related Elements:** `channel_subsystem.mmd`  
 **Tasks:** T-151 to T-156  
 **Acceptance Criteria:** AC-144 to AC-148  
 **Depends on:** FEAT-010, FEAT-007, FEAT-032, FEAT-006
 
 ### FEAT-034 — MODE command
 
-**Related Elements:** `irc_channels.mmd`  
+**Related Elements:** `channel_subsystem.mmd`  
 **Tasks:** T-157 to T-162  
 **Acceptance Criteria:** AC-149 to AC-153  
 **Depends on:** FEAT-010, FEAT-007, FEAT-032, FEAT-006
 
 ### FEAT-035 — TOPIC command
 
-**Related Elements:** `irc_channels.mmd`  
+**Related Elements:** `channel_subsystem.mmd`  
 **Tasks:** T-163 to T-168  
 **Acceptance Criteria:** AC-154 to AC-158  
 **Depends on:** FEAT-010, FEAT-007, FEAT-032, FEAT-006
 
 ### FEAT-036 — INVITE command
 
-**Related Elements:** `irc_channels.mmd`  
+**Related Elements:** `channel_subsystem.mmd`  
 **Tasks:** T-169 to T-174  
 **Acceptance Criteria:** AC-159 to AC-163  
 **Depends on:** FEAT-010, FEAT-007, FEAT-032, FEAT-006
