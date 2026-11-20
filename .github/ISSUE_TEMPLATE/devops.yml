@@ -1,0 +1,134 @@
+
+name: "New DevOps Issue"
+description: "Create a DevOps issue for infrastructure, CI/CD, automation or operational improvements"
+title: "[DEVOPS] <issue title>"
+labels: ["devops", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # DevOps Issue Template
+
+        A **DevOps issue** represents a task related to infrastructure,
+        CI/CD pipelines, automation, deployment, monitoring or operational
+        improvements.
+
+        Each issue has a traceability ID (e.g. DEVOPS-001)
+        and a list of acceptance criteria (e.g. AC-001, AC-002).
+
+  - type: input
+    id: devops-id
+    attributes:
+      label: "DevOps traceability ID"
+      description: "Example: DEVOPS-001. Use it to reference this issue in commits, branches and PRs."
+      placeholder: "DEVOPS-001"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "Description"
+      description: "Describe what needs to be implemented and why."
+      placeholder: |
+        What needs to be done?
+        What problem does it solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: "Dependencies"
+      description: |
+        List the IDs of the features or DevOps issues this task depends on.
+        Use one ID per line.
+        Leave empty if there are no dependencies.
+        Examples:
+        - FEAT-001
+        - DEVOPS-002
+      placeholder: |
+        - FEAT-001
+        - DEVOPS-002
+    validations:
+      required: false
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: "DevOps category"
+      description: "Select the main area affected by this issue."
+      options:
+        - "CI/CD"
+        - "Infrastructure"
+        - "Docker / Containers"
+        - "Deployment"
+        - "Automation / Scripting"
+        - "Monitoring / Logging"
+        - "Security"
+        - "Cloud Services"
+        - "Configuration Management"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: "Acceptance criteria"
+      description: |
+        List acceptance criteria, one per line, each with its own traceability ID.
+        Example:
+        - AC-001: The CI pipeline runs successfully.
+        - AC-002: Deployment is fully automated.
+        - AC-003: Secrets are securely managed.
+      placeholder: |
+        - AC-001: ...
+        - AC-002: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: "Associated tasks"
+      description: |
+        List the subtasks required to complete this issue.
+        Example:
+        - T-001: Configure GitHub Actions.
+        - T-002: Add deployment validation.
+      placeholder: |
+        - T-001: ...
+        - T-002: ...
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: "Impact"
+      description: "Estimate the impact of this change on the project."
+      options:
+        - "Low"
+        - "Medium"
+        - "High"
+        - "Critical"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: "Estimated complexity"
+      options:
+        - "Low"
+        - "Medium"
+        - "High"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: ready
+    attributes:
+      label: "Confirmation"
+      options:
+        - label: "I have verified that no issue with the same functionality already exists."
+          required: true

@@ -1,0 +1,174 @@
+flowchart LR
+    %% ---------- Root features (no dependencies) ----------
+    subgraph G_ROOT["Root features (no dependencies)"]
+        F001["FEAT-001<br/>Base exception model"]
+        F008["FEAT-008<br/>IRCDto"]
+        F013["FEAT-013<br/>ISocketService"]
+    end
+
+    %% ---------- Base layers (depend on FEAT-001) ----------
+    subgraph G_BASE["Base layers (depend on FEAT-001)"]
+        F002["FEAT-002<br/>Client business model"]
+        F005["FEAT-005<br/>Channel business model"]
+    end
+
+    %% ---------- Client services (depend on FEAT-002) ----------
+    subgraph G_CLIENT["Client services (depend on FEAT-002)"]
+        F003["FEAT-003<br/>Client authentication management"]
+        F004["FEAT-004<br/>Client registration management"]
+    end
+
+    %% ---------- Core services ----------
+    F006["FEAT-006<br/>Channel management (ChannelSystem)"]
+    F007["FEAT-007<br/>Client management (ClientSystem)"]
+    F009["FEAT-009<br/>Security filtering"]
+    F010["FEAT-010<br/>Command logic"]
+    F011["FEAT-011<br/>Command Parser"]
+    F012["FEAT-012<br/>Command management (CommandSystem)"]
+    F014["FEAT-014<br/>Socket server"]
+    F015["FEAT-015<br/>IRCService"]
+    F017["FEAT-017<br/>QUIT command"]
+
+    %% ---------- Basic security filters (depend on FEAT-009 + FEAT-007) ----------
+    subgraph G_FILTERS["Basic security filters (depend on FEAT-009 + FEAT-007)"]
+        F019["FEAT-019<br/>AuthenticatedFilter"]
+        F022["FEAT-022<br/>RegisteredFilter"]
+        F023["FEAT-023<br/>ChainFilter"]
+        F027["FEAT-027<br/>ChannelMemberFilter"]
+        F031["FEAT-031<br/>ChannelOperatorFilter"]
+    end
+
+    %% ---------- Security filter factories ----------
+    subgraph G_FACTORY["Security filter factories"]
+        F024["FEAT-024<br/>getCommonAccessFilter"]
+        F028["FEAT-028<br/>getChannelCommonAccessFilter"]
+        F032["FEAT-032<br/>getChannelOperatorAccessFilter"]
+    end
+
+    %% ---------- Simple commands (depend on FEAT-010 + FEAT-007) ----------
+    subgraph G_SIMPLE["Simple commands (depend on FEAT-010 + FEAT-007)"]
+        F016["FEAT-016<br/>PASS command"]
+        F018["FEAT-018<br/>PING command"]
+    end
+
+    %% ---------- Registration commands (depend on FEAT-010 + FEAT-007 + FEAT-019) ----------
+    subgraph G_REG["Registration commands (depend on FEAT-010 + FEAT-007 + FEAT-019)"]
+        F020["FEAT-020<br/>NICK command"]
+        F021["FEAT-021<br/>USER command"]
+    end
+
+    %% ---------- Channel access commands (depend on FEAT-010 + FEAT-007 + FEAT-024 + FEAT-006) ----------
+    subgraph G_ACCESS["Channel access commands (depend on FEAT-010 + FEAT-007 + FEAT-024 + FEAT-006)"]
+        F025["FEAT-025<br/>JOIN command"]
+        F026["FEAT-026<br/>LIST command"]
+    end
+
+    %% ---------- Channel member commands (depend on FEAT-010 + FEAT-007 + FEAT-028 + FEAT-006) ----------
+    subgraph G_MEMBER["Channel member commands (depend on FEAT-010 + FEAT-007 + FEAT-028 + FEAT-006)"]
+        F029["FEAT-029<br/>PRIVMSG command"]
+        F030["FEAT-030<br/>PART command"]
+    end
+
+    %% ---------- Channel operator commands (depend on FEAT-010 + FEAT-007 + FEAT-032 + FEAT-006) ----------
+    subgraph G_OPERATOR["Channel operator commands (depend on FEAT-010 + FEAT-007 + FEAT-032 + FEAT-006)"]
+        F033["FEAT-033<br/>KICK command"]
+        F034["FEAT-034<br/>MODE command"]
+        F035["FEAT-035<br/>TOPIC command"]
+        F036["FEAT-036<br/>INVITE command"]
+    end
+
+    %% ---------- Dependencies ----------
+    %% Root features feed base layers
+    F001 --> G_BASE
+
+    %% Base layer feeds client services
+    F002 --> G_CLIENT
+
+    %% Channel business model + client model feed channel management
+    F005 --> F006
+    F002 --> F006
+
+    %% Client services + channel management feed client management
+    F004 --> F007
+    F003 --> F007
+    F006 --> F007
+    F002 --> F007
+
+    %% Root + IRCDto feed command parser
+    F008 --> F011
+    F001 --> F011
+
+    %% Command logic + parser feed command management
+    F010 --> F012
+    F011 --> F012
+
+    %% ISocketService + root feed socket server
+    F013 --> F014
+    F001 --> F014
+
+    %% ISocketService + command management + client/channel management feed IRCService
+    F013 --> F015
+    F012 --> F015
+    F007 --> F015
+    F006 --> F015
+
+    %% Root feeds security filtering
+    F001 --> F009
+    F007 --> F009
+    F006 --> F009
+
+    %% Security filtering feeds command logic
+    F009 --> F010
+    F007 --> F010
+    F006 --> F010
+    F001 --> F010
+
+    %% Command logic + client management feed simple commands
+    F010 --> G_SIMPLE
+    F007 --> G_SIMPLE
+
+    %% Security filtering + client management feed basic filters
+    F009 --> G_FILTERS
+    F007 --> G_FILTERS
+
+    %% Basic filters feed common access filter factory
+    F019 --> F024
+    F023 --> F024
+    F022 --> F024
+
+    %% Command logic + client management + security filtering feed registration commands
+    F010 --> G_REG
+    F007 --> G_REG
+    F019 --> G_REG
+    F006 --> F020
+
+    %% Command logic + client management + common access filter feed channel access commands
+    F010 --> G_ACCESS
+    F007 --> G_ACCESS
+    F024 --> G_ACCESS
+    F006 --> G_ACCESS
+
+    %% Common access + channel member filter feed channel common access factory
+    F024 --> F028
+    F027 --> F028
+
+    %% Command logic + client management + channel common access feed channel member commands
+    F010 --> G_MEMBER
+    F007 --> G_MEMBER
+    F028 --> G_MEMBER
+    F006 --> G_MEMBER
+
+    %% Channel common access + channel operator filter feed operator access factory
+    F028 --> F032
+    F031 --> F032
+
+    %% Command logic + client management + operator access feed channel operator commands
+    F010 --> G_OPERATOR
+    F007 --> G_OPERATOR
+    F032 --> G_OPERATOR
+    F006 --> G_OPERATOR
+
+    %% QUIT command (standalone)
+    F010 --> F017
+    F007 --> F017
+    F006 --> F017

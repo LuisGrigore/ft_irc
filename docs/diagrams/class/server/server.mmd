@@ -1,0 +1,65 @@
+classDiagram
+  class SocketServer {
+    - int port
+    - int listenFd
+    - bool running
+    - volatile sig_atomic_t stopping
+    - std::set~int~ clients
+    - ISocketService& socketService
+    + SocketServer(int port, ISocketService& socketService)
+    + ~SocketServer()
+    + void run()
+    + void stop()
+  }
+  class ISocketService {
+    <<interface>>
+    + virtual ~ISocketService()
+    + virtual void onConnect(int fd, std::string& hostname) = 0
+    + virtual void onData(int fd, const std::string& data) = 0
+    + virtual void onDisconnect(int fd) = 0
+    + virtual TickResult tick(const std::map~int, int~& consumedBytes) = 0
+  }
+  class TickResult {
+    <<struct>>
+    - std::map~int, std::string~ outputs
+    - std::set~int~ toClose
+    + TickResult()
+    + TickResult(const std::map~int, std::string~& outputs, const std::set~int~& toClose)
+  }
+  class IRCService {
+    - ClientManager& clientManager
+    - CommandManager& commandManager
+    - ChannelManager& channelManager
+    - static const size_t OUTPUT_BYTES_READ
+    + IRCService(ClientManager& clientManager, CommandManager& commandManager, ChannelManager& channelManager)
+    + virtual ~IRCService()
+    + virtual void onConnect(int fd, std::string& hostname)
+    + virtual void onData(int fd, const std::string& data)
+    + virtual void onDisconnect(int fd)
+    + virtual TickResult tick(const std::map~int, int~& consumedBytes)
+  }
+  class ChannelSystem {
+    <<external>>
+    "This class is defined in the "channel_subsystem" diagram"
+  }
+  class ClientSystem {
+    <<external>>
+    "This class is defined in the "client_subsystem" diagram"
+  }
+  class CommandSystem {
+    <<external>>
+    "This class is defined in the "command_subsystem" diagram"
+  }
+  style SocketServer stroke:#82b366
+  style ChannelSystem stroke:#b85450
+  style ClientSystem stroke:#b85450
+  style CommandSystem stroke:#b85450
+
+  SocketServer o-- ISocketService : uses
+  ISocketService ..> TickResult : returns
+  IRCService ..|> ISocketService : implements
+  IRCService o-- ChannelSystem : uses
+  IRCService o-- ClientSystem : uses
+  IRCService o-- CommandSystem : uses
+
+%% graph:positions {"SocketServer":{"x":-300,"y":-75,"w":478,"h":271},"ISocketService":{"x":444,"y":-10,"w":522,"h":177},"TickResult":{"x":392,"y":420,"w":638,"h":180},"IRCService":{"x":1164,"y":-60,"w":771,"h":283},"ChannelSystem":{"x":2148,"y":-122,"w":427,"h":95},"ClientSystem":{"x":2148,"y":14,"w":432,"h":95},"CommandSystem":{"x":2148,"y":149,"w":427,"h":95}}

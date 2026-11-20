@@ -1,0 +1,205 @@
+classDiagram
+  class Client {
+    <<entity>>
+    - int fd
+    - std::string nick
+    - std::string username
+    - std::string realname
+    - std::string hostname
+    - std::set~std::string~ channels
+    - bool authenticated
+    - bool registered
+    - bool quitting
+    + Client(int fd)
+    + ~Client()
+    + int getFd() const
+    + const std::string& getNick() const
+    + const std::string& getUsername() const
+    + const std::string& getRealname() const
+    + const std::string& getHostname() const
+    + void setFd(int fd)
+    + void setNick(const std::string& nick)
+    + void setUsername(const std::string& username)
+    + void setRealname(const std::string& realname)
+    + void setHostname(const std::string& hostname)
+    + void setAuthenticated(bool authenticated)
+    + void setRegistered(bool registered)
+    + void setQuitting(bool quitting)
+    + bool isAuthenticated() const
+    + bool isRegistered() const
+    + bool isQuitting() const
+    + bool isInputBufferEmpty() const
+    + bool isOutputBufferEmpty() const
+    + void pushInput(const std::string& data)
+    + void pushOutput(const std::string& data)
+    + bool getNextInputLine(std::string& line)
+    + std::string peekOutput(size_t length) const
+    + void consumeOutput(size_t length)
+    + void addChannel(const std::string& channelName)
+    + void removeChannel(const std::string& channelName)
+    + std::set~std::string~ getChannel() const
+  }
+  class ClientBuffer {
+    <<buffer>>
+    - std::string buffer
+    + ClientBuffer()
+    + ~ClientBuffer()
+    + void push(const std::string& data)
+    + std::string peek(size_t length) const
+    + void consume(size_t length)
+    + bool empty() const
+    + size_t size() const
+    + void clear()
+    + size_t find(const std::string& needle) const
+  }
+  class ClientRegistry {
+    <<registry>>
+    - std::map~int, Client*~ clientsByFd
+    + ClientRegistry()
+    + ~ClientRegistry()
+    + Client& findClient(int fd)
+    + void addClient(int fd)
+    + void removeClient(int fd)
+  }
+  class NickManager {
+    <<registry>>
+    - std::map~std::string, int~ nicks
+    - static const size_t NICK_MAX_LENGTH
+    + NickManager()
+    + ~NickManager()
+    + bool isAvailable(const std::string& nick) const
+    + bool reserve(const std::string& nick, int fd)
+    + int getFd(const std::string& nick) const
+    + void release(const std::string& nick)
+    + bool isValid(const std::string& nick) const
+  }
+  class AuthenticationManager {
+    <<manager>>
+    - ClientRegistry& clientRegistry
+    - const std::string password
+    + AuthenticationManager(ClientRegistry& clientRegistry, const std::string& password)
+    + ~AuthenticationManager()
+    + void authenticate(int fd, const std::string& password)
+    + void unAuthenticate(int fd)
+    + bool isAuthenticated(int fd) const
+  }
+  class RegistrationManager {
+    <<manager>>
+    - ClientRegistry& clientRegistry
+    - NickManager& nickManager
+    + RegistrationManager(ClientRegistry& clientRegistry, NickManager& nickManager)
+    + ~RegistrationManager()
+    + void setNick(int fd, const std::string& nick)
+    + void setUsername(int fd, const std::string& username)
+    + void setRealname(int fd, const std::string& realname)
+    + void setHostname(int fd, const std::string& hostname)
+    + bool isRegistered(int fd) const
+    + void unRegister(int fd)
+    + int getFdByNick(const std::string& nick) const
+  }
+  class PendingIOManager {
+    <<manager>>
+    - ClientRegistry& clientRegistry
+    - std::set~int~ hasPendingInput
+    - std::set~int~ hasPendingOutput
+    + PendingIOManager(ClientRegistry& clientRegistry)
+    + ~PendingIOManager()
+    + void pushInput(int fd, const std::string& data)
+    + bool getNextInputLine(int fd, std::string& line)
+    + void pushOutput(int fd, const std::string& data)
+    + std::string peekOutput(int fd, size_t length) const
+    + void consumeOutput(int fd, size_t length)
+    + std::set~int~ getHasPendingInput() const
+    + std::set~int~ getHasPendingOutput() const
+  }
+  class ClientLifecycleManager {
+    <<manager>>
+    - ClientRegistry& clientRegistry
+    - AuthenticationManager& authManager
+    - RegistrationManager& registrationManager
+    - ChannelMembershipManager& channelMembershipManager
+    - PendingIOManager& pendingIOManager
+    - std::set~int~ isQuitting
+    + ClientLifecycleManager(ClientRegistry& clientRegistry, AuthenticationManager& authManager, RegistrationManager& registrationManager, ChannelMembershipManager& channelMembershipManager, PendingIOManager& pendingIOManager)
+    + ~ClientLifecycleManager()
+    + void addClient(int fd)
+    + void removeClient(int fd)
+    + std::set~int~ getIsQuitting() const
+    + std::set~int~ getClientsToClose() const
+  }
+  class ClientSystem {
+    <<facade>>
+    - ClientLifecycleManager& lifecycleManager
+    - PendingIOManager& pendingIOManager
+    - AuthenticationManager& authManager
+    - RegistrationManager& registrationManager
+    - ClientQueryManager& clientQueryManager
+    + ClientSystem(ClientLifecycleManager& lifecycleManager, PendingIOManager& pendingIOManager, AuthenticationManager& authManager, RegistrationManager& registrationManager, ClientQueryManager& clientQueryManager)
+    + ~ClientSystem()
+    + std::set~int~ getClientsToClose() const
+    + std::set~int~ getHasPendingInput() const
+    + std::set~int~ getHasPendingOutput() const
+    + std::set~int~ getIsQuitting() const
+    + void addClient(int fd)
+    + void removeClient(int fd)
+    + void pushInput(int fd, const std::string& data)
+    + bool getNextInputLine(int fd, std::string& line)
+    + void pushOutput(int fd, const std::string& data)
+    + std::string peekOutput(int fd, size_t length) const
+    + void consumeOutput(int fd, size_t length)
+    + void setQuitting(int fd, bool quitting)
+    + void authenticate(int fd, const std::string& password)
+    + bool isAuthenticated(int fd) const
+    + void setNick(int fd, const std::string& nick)
+    + void setUsername(int fd, const std::string& username)
+    + void setRealname(int fd, const std::string& realname)
+    + void setHostname(int fd, const std::string& hostname)
+    + bool isRegistered(int fd) const
+    + int getFdByNick(const std::string& nick) const
+    + ClientDetails getClientDetails(int fd) const
+  }
+  class ClientDetails {
+    <<struct>>
+    + int fd
+    + std::string nick
+    + std::string username
+    + std::string realname
+    + std::string hostname
+    + bool authenticated
+    + bool registered
+    + bool quitting
+    + std::set~std::string~ channels
+  }
+  class ChannelMembershipManager {
+    <<external>>
+    "This class is defined in the "channel_subsystem" diagram"
+  }
+  class Note0 {
+    "ClientSystem is a facade that only delegates to managers. The command system must use it as the only entry point to the client subsystem and must never call managers directly. Every facade method is an independent operation and never sends messages; replies and notifications are the responsibility of the command system."
+  }
+  style ClientRegistry stroke:#82b366
+  style PendingIOManager stroke:#82b366
+  style ClientSystem stroke:#82b366
+  style Note0 fill:#fff2cc,stroke:#d6b656,color:#111111
+
+  Client "1" *-- "2" ClientBuffer : owns
+  ClientRegistry "1" *-- "0..n" Client : owns
+  AuthenticationManager o-- "1" ClientRegistry : uses
+  RegistrationManager o-- "1" ClientRegistry : uses
+  RegistrationManager o-- "1" NickManager : uses
+  PendingIOManager o-- "1" ClientRegistry : uses
+  ClientLifecycleManager o-- "1" ClientRegistry : uses
+  ClientLifecycleManager o-- "1" AuthenticationManager : uses
+  ClientLifecycleManager o-- "1" RegistrationManager : uses
+  ClientLifecycleManager o-- "1" ChannelMembershipManager : uses
+  ClientLifecycleManager o-- "1" PendingIOManager : uses
+  ClientSystem o-- "1" ClientLifecycleManager : delegates
+  ClientSystem o-- "1" PendingIOManager : delegates
+  ClientSystem o-- "1" AuthenticationManager : delegates
+  ClientSystem o-- "1" RegistrationManager : delegates
+  ClientSystem o-- "1" ClientRegistry : uses
+  ClientSystem ..> ClientDetails : creates
+  Note0 --> ClientSystem
+%% graph:positions {"Client":{"x":3515,"y":264,"w":399,"h":785},"ClientBuffer":{"x":3542,"y":-116,"w":357,"h":276},"ClientRegistry":{"x":3576,"y":1184,"w":264,"h":324},"NickManager":{"x":187,"y":840,"w":390,"h":246},"AuthenticationManager":{"x":792,"y":1380,"w":608,"h":221},"RegistrationManager":{"x":83,"y":1212,"w":562,"h":307},"PendingIOManager":{"x":1764,"y":1176,"w":418,"h":301},"ClientLifecycleManager":{"x":2424,"y":828,"w":626,"h":356},"ClientSystem":{"x":1284,"y":-24,"w":1336,"h":622},"ClientDetails":{"x":660,"y":136,"w":273,"h":248},"ChannelMembershipManager":{"x":2712,"y":480,"w":284,"h":96},"Note0":{"x":1644,"y":-204,"w":547,"h":112}}
+%% graph:waypoints {"AuthenticationManager>ClientRegistry":[[3506,1550]],"RegistrationManager>ClientRegistry":[[679,1693],[2105,1695]],"ClientLifecycleManager>AuthenticationManager":[[1314,979]],"ClientLifecycleManager>RegistrationManager":[[677,938]],"ClientLifecycleManager>PendingIOManager":[[2332,1299]],"ClientSystem>PendingIOManager":[[1972,618]],"ClientSystem>AuthenticationManager":[[1980,681]],"ClientSystem>RegistrationManager":[[828,520]]}
+%% graph:edges {"ClientSystem>PendingIOManager":{"label":[-2,-63]}}

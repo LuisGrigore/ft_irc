@@ -1,0 +1,146 @@
+classDiagram
+  class ChannelMembershipManager {
+    <<manager>>
+    - ChannelRegistry& channelRegistry
+    - ClientRegistry& clientRegistry
+    + ChannelMembershipManager(ChannelRegistry& channelRegistry, ClientRegistry& clientRegistry)
+    + ~ChannelMembershipManager()
+    + void createChannel(int fd, const std::string& channelName)
+    + void addMemberToChannel(int fd, const std::string& channelName)
+    + void removeClientFromChannel(int fd, const std::string& channelName)
+    + void removeClientFromAllChannels(int fd)
+    + bool isMember(int fd, const std::string& channelName) const
+    + void setOperator(int fd, const std::string& channelName, bool isOperator)
+    + bool isOperator(int fd, const std::string& channelName) const
+    + void addInviteToChannel(int fd, const std::string& channelName)
+    + void consumeInviteToChannel(int fd, const std::string& channelName)
+    + bool isInvited(int fd, const std::string& channelName) const
+  }
+  class ChannelSettingsManager {
+    <<manager>>
+    - ChannelRegistry& channelRegistry
+    + ChannelSettingsManager(ChannelRegistry& channelRegistry)
+    + ~ChannelSettingsManager()
+    + void setInviteOnly(const std::string& channelName, bool inviteOnly)
+    + void setTopicProtected(const std::string& channelName, bool topicProtected)
+    + void setLimit(const std::string& channelName, int limit)
+    + void setKey(const std::string& channelName, const std::string& key)
+    + void setTopic(const std::string& channelName, const std::string& topic)
+  }
+  class ChannelBroadcastManager {
+    <<manager>>
+    - ChannelRegistry& channelRegistry
+    - PendingIOManager& pendingIOManager
+    + ChannelBroadcastManager(ChannelRegistry& channelRegistry, PendingIOManager& pendingIOManager)
+    + ~ChannelBroadcastManager()
+    + void broadcast(int fd, const std::string& channelName, const std::string& message)
+  }
+  class ChannelSystem {
+    <<facade>>
+    - ChannelMembershipManager& membershipManager
+    - ChannelSettingsManager& settingsManager
+    - ChannelRegistry& channelRegistry
+    - ChannelBroadcastManager& broadcastManager
+    + ChannelSystem(ChannelMembershipManager& membershipManager, ChannelSettingsManager& settingsManager, ChannelRegistry& channelRegistry, ChannelBroadcastManager& broadcastManager)
+    + ~ChannelSystem()
+    + void createChannel(int fd, const std::string& channelName)
+    + void removeClientFromChannel(int fd, const std::string& channelName)
+    + void addInviteToChannel(int fd, const std::string& channelName)
+    + void addMemberToChannel(int fd, const std::string& channelName)
+    + void consumeInviteToChannel(int fd, const std::string& channelName)
+    + void setOperator(int fd, const std::string& channelName, bool isOperator)
+    + void setInviteOnly(const std::string& channelName, bool inviteOnly)
+    + void setTopicProtected(const std::string& channelName, bool topicProtected)
+    + void setLimit(const std::string& channelName, int limit)
+    + void setKey(const std::string& channelName, const std::string& key)
+    + void setTopic(const std::string& channelName, const std::string& topic)
+    + ChannelDetails getChannelDetails(const std::string& channelName) const
+    + bool isMember(int fd, const std::string& channelName) const
+    + bool isOperator(int fd, const std::string& channelName) const
+    + bool isInvited(int fd, const std::string& channelName) const
+    + void broadcast(int fd, const std::string& channelName, const std::string& message)
+  }
+  class Channel {
+    <<entity>>
+    - const std::string name
+    - std::string topic
+    - std::set~int~ members
+    - std::set~int~ operators
+    - std::set~int~ invited
+    - std::string key
+    - int limit
+    - bool inviteOnly
+    - bool topicProtected
+    + std::string getName() const
+    + std::string getTopic() const
+    + void setTopic(const std::string& topic)
+    + std::string getKey() const
+    + void setKey(const std::string& key)
+    + int getLimit() const
+    + void setLimit(int limit)
+    + bool isInviteOnly() const
+    + void setInviteOnly(bool inviteOnly)
+    + bool isTopicProtected() const
+    + void setTopicProtected(bool topicProtected)
+    + void addMember(int fd)
+    + void removeMember(int fd)
+    + bool isMember(int fd) const
+    + std::set~int~ getMembers() const
+    + void addOperator(int fd)
+    + void removeOperator(int fd)
+    + bool isOperator(int fd) const
+    + void addInvited(int fd)
+    + void consumeInvited(int fd)
+    + bool isInvited(int fd) const
+  }
+  class ChannelRegistry {
+    <<registry>>
+    - std::map~std::string, Channel*~ channels
+    + ChannelRegistry()
+    + ~ChannelRegistry()
+    + Channel& findChannel(const std::string& name)
+    + void addChannel(const std::string& name)
+    + void removeChannel(const std::string& name)
+  }
+  class ChannelDetails {
+    <<struct>>
+    + std::string name
+    + std::string topic
+    + std::string key
+    + int limit
+    + bool inviteOnly
+    + bool topicProtected
+    + std::set~int~ members
+    + std::set~int~ operators
+  }
+  class ClientRegistry {
+    <<external>>
+    "This class is defined in the "client_subsystem" diagram"
+  }
+  class PendingIOManager {
+    <<external>>
+    "This class is defined in the "client_subsystem" diagram"
+  }
+  class Note0 {
+    "ChannelSystem is a facade that only delegates to managers. The command system must use it as the only entry point to the channel subsystem and must never call managers directly. Every facade method is an independent operation and never sends messages; replies and notifications are the responsibility of the command system."
+  }
+  style ChannelSystem stroke:#82b366
+  style ClientRegistry stroke:#b85450
+  style PendingIOManager stroke:#b85450
+  style Note0 fill:#fff2cc,stroke:#d6b656,color:#111111
+
+  ChannelRegistry "1" *-- "0..n" Channel : owns
+  ChannelMembershipManager o-- "1" ChannelRegistry : uses
+  ChannelMembershipManager o-- "1" ClientRegistry : uses
+  ChannelSettingsManager o-- "1" ChannelRegistry : uses
+  ChannelBroadcastManager o-- "1" ChannelRegistry : uses
+  ChannelBroadcastManager o-- "1" PendingIOManager : uses
+  ChannelSystem o-- "1" ChannelMembershipManager : delegates
+  ChannelSystem o-- "1" ChannelSettingsManager : delegates
+  ChannelSystem o-- "1" ChannelRegistry : delegates
+  ChannelSystem o-- "1" ChannelBroadcastManager : delegates
+  ChannelSystem ..> ChannelDetails : creates
+  Note0 --> ChannelSystem
+
+%% graph:positions {"ChannelMembershipManager":{"x":-192,"y":696,"w":698,"h":321},"ChannelSettingsManager":{"x":852,"y":732,"w":571,"h":209},"ChannelBroadcastManager":{"x":2028,"y":756,"w":738,"h":171},"ChannelSystem":{"x":972,"y":96,"w":1300,"h":496},"Channel":{"x":1452,"y":1500,"w":361,"h":611},"ChannelRegistry":{"x":1435,"y":1212,"w":353,"h":209},"ChannelDetails":{"x":2424,"y":235,"w":223,"h":224},"ClientRegistry":{"x":-60,"y":540,"w":444,"h":95},"PendingIOManager":{"x":2187,"y":972,"w":432,"h":95},"Note0":{"x":1367,"y":-84,"w":510,"h":120}}
+%% graph:waypoints {"ChannelMembershipManager>ChannelRegistry":[[737,890]],"ChannelSettingsManager>ChannelRegistry":[[1127,1281]]}

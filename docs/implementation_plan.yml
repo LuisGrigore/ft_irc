@@ -1,0 +1,1565 @@
+document:
+  title: Implementation Plan
+  intro: 'Traceability plan for the **ft_irc** IRC server project, derived from:'
+features:
+- id: FEAT-001
+  name: BaseException and Business exceptions (one per IRC error code)
+  related_elements: []
+  depends_on: []
+  acceptance_criteria:
+  - id: AC-001
+    description: BaseException exposes the IRC numeric/error code, a stable message, and any context required
+      to build an IRC error reply.
+  - id: AC-002
+    description: Every concrete business exception derives from BaseException and maps to exactly one
+      documented IRC error condition.
+  - id: AC-003
+    description: Business exceptions preserve actionable context (such as nickname, channel, command,
+      or parameter) without depending on transport-layer state.
+  tasks:
+  - id: T-001
+    description: Tests BaseException
+  - id: T-002
+    description: Implement BaseException
+  - id: T-003
+    description: Refactor BaseException
+- id: FEAT-002
+  name: Client entity and ClientRegistry
+  related_elements: []
+  depends_on:
+  - FEAT-001
+  acceptance_criteria:
+  - id: AC-004
+    description: Client stores and exposes its connection identity, registration/authentication state,
+      nickname, username, real name, and connection metadata without inconsistent duplicate state.
+  - id: AC-005
+    description: Client input and output buffers preserve byte order, support partial reads/writes, and
+      retain unsent or unprocessed bytes between event-loop iterations.
+  - id: AC-006
+    description: ClientRegistry indexes each live client by file descriptor and supports lookup by fd
+      and by registered nickname without returning stale or disconnected clients.
+  - id: AC-007
+    description: Registering, retrieving, and removing clients keeps all registry indexes consistent and
+      prevents duplicate fd or nickname ownership.
+  - id: AC-008
+    description: Operations on unknown, already-registered, or already-removed clients raise the corresponding
+      typed business exception.
+  tasks:
+  - id: T-004
+    description: Tests Client
+  - id: T-005
+    description: Implement Client
+  - id: T-006
+    description: Refactor Client
+  - id: T-007
+    description: Tests ClientRegistry
+  - id: T-008
+    description: Implement ClientRegistry
+  - id: T-009
+    description: Refactor ClientRegistry
+- id: FEAT-003
+  name: Client authentication management
+  related_elements:
+  - client_subsystem.mmd
+  depends_on:
+  - FEAT-002
+  acceptance_criteria:
+  - id: AC-009
+    description: AuthenticationManager validates the configured server password using the supplied PASS
+      value and does not authenticate a client when the password is absent or incorrect.
+  - id: AC-010
+    description: Authentication state is tracked independently for each client and changes to authenticated
+      only after successful validation.
+  - id: AC-011
+    description: Repeated PASS attempts do not corrupt authentication state, and successful authentication
+      is not revoked by an unrelated client's attempt.
+  - id: AC-012
+    description: Missing, malformed, or incorrect credentials raise the appropriate business exception
+      so the command layer can return the corresponding IRC error.
+  tasks:
+  - id: T-010
+    description: Tests AuthenticationManager
+  - id: T-011
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-012
+    description: Refactor AuthenticationManager
+- id: FEAT-004
+  name: Client registration management
+  related_elements:
+  - client_subsystem.mmd
+  depends_on:
+  - FEAT-002
+  acceptance_criteria:
+  - id: AC-013
+    description: NickManager validates nickname syntax and length according to the server's supported
+      IRC nickname rules.
+  - id: AC-014
+    description: NickManager reserves nicknames case-insensitively and prevents two connected clients
+      from owning equivalent nicknames.
+  - id: AC-015
+    description: Nickname changes release the previous nickname and reserve the new nickname atomically,
+      without leaving stale reservations.
+  - id: AC-016
+    description: RegistrationManager stores the USER registration fields and determines whether the required
+      registration fields have been supplied.
+  - id: AC-017
+    description: Registration completion is derived consistently from the required authentication, nickname,
+      and USER state; partial registration remains pending.
+  - id: AC-018
+    description: Invalid, missing, or already-in-use nicknames and invalid registration transitions raise
+      the appropriate business exceptions.
+  tasks:
+  - id: T-013
+    description: Tests NickManager
+  - id: T-014
+    description: Implement NickManager
+  - id: T-015
+    description: Refactor NickManager
+  - id: T-016
+    description: Tests RegistrationManager
+  - id: T-017
+    description: Implement RegistrationManager
+  - id: T-018
+    description: Refactor RegistrationManager
+- id: FEAT-005
+  name: Channel entity and ChannelRegistry
+  related_elements:
+  - channel_subsystem.mmd
+  depends_on:
+  - FEAT-001
+  acceptance_criteria:
+  - id: AC-019
+    description: Channel stores its name, topic, modes, key/limit configuration, and membership/operator
+      state required by supported IRC commands.
+  - id: AC-020
+    description: Channel membership supports adding and removing clients while maintaining a single consistent
+      membership relationship.
+  - id: AC-021
+    description: Channel membership distinguishes ordinary members from channel operators and exposes
+      membership/operator checks.
+  - id: AC-022
+    description: ChannelRegistry identifies channels by their IRC case-insensitive channel name and supports
+      lookup by name.
+  - id: AC-023
+    description: ChannelRegistry creates a channel when required, reuses an existing channel, and removes
+      it when its final member leaves, according to server lifecycle rules.
+  - id: AC-024
+    description: Duplicate creation, invalid channel names, missing channels, and inconsistent membership
+      operations raise the corresponding business exceptions.
+  tasks:
+  - id: T-019
+    description: Tests Channel
+  - id: T-020
+    description: Implement Channel
+  - id: T-021
+    description: Refactor Channel
+  - id: T-022
+    description: Tests ChannelRegistry
+  - id: T-023
+    description: Implement ChannelRegistry
+  - id: T-024
+    description: Refactor ChannelRegistry
+- id: FEAT-006
+  name: Channel management (ChannelSystem)
+  related_elements:
+  - channel_subsystem.mmd
+  depends_on:
+  - FEAT-005
+  - FEAT-002
+  acceptance_criteria:
+  - id: AC-025
+    description: ChannelSystem validates channel names and coordinates channel creation, joining, leaving,
+      and membership updates through ChannelRegistry.
+  - id: AC-026
+    description: A client can join an existing channel or cause a valid channel to be created, and receives
+      the channel's current membership/topic state as required by the protocol.
+  - id: AC-027
+    description: A client leaving a channel is removed from membership, and an empty channel is destroyed
+      when the server's lifecycle rules require it.
+  - id: AC-028
+    description: Channel messages are delivered exactly once to all current channel members except the
+      sender, without being sent to non-members.
+  - id: AC-029
+    description: Supported channel modes are parsed, validated, stored, and enforced consistently by channel
+      operations.
+  - id: AC-030
+    description: Invalid channel names, attempts to join inaccessible channels, duplicate membership,
+      or attempts to leave a channel the client has not joined raise appropriate business exceptions.
+  tasks:
+  - id: T-025
+    description: Tests ChannelSystem
+  - id: T-026
+    description: Implement ChannelSystem
+  - id: T-027
+    description: Refactor ChannelSystem
+- id: FEAT-007
+  name: Client management (ClientSystem)
+  related_elements:
+  - client_subsystem.mmd
+  depends_on:
+  - FEAT-004
+  - FEAT-003
+  - FEAT-006
+  - FEAT-002
+  acceptance_criteria:
+  - id: AC-031
+    description: ClientSystem tracks connected, pending-registration, and quitting clients without placing
+      a client in conflicting lifecycle states.
+  - id: AC-032
+    description: ClientSystem provides consistent access to client records by the supported identifiers
+      and delegates ownership/index consistency to ClientRegistry.
+  - id: AC-033
+    description: Disconnecting a client removes it from active management and initiates cleanup of nickname
+      and channel memberships.
+  - id: AC-034
+    description: Repeated disconnect or lifecycle transitions are handled idempotently or rejected with
+      a documented business exception, without corrupting state.
+  - id: AC-035
+    description: Requests involving unknown clients or invalid client lifecycle transitions raise the
+      appropriate business exception.
+  tasks:
+  - id: T-028
+    description: Tests ClientSystem
+  - id: T-029
+    description: Implement ClientSystem
+  - id: T-030
+    description: Refactor ClientSystem
+- id: FEAT-008
+  name: IRCDto
+  related_elements: []
+  depends_on: []
+  acceptance_criteria:
+  - id: AC-036
+    description: IRCDto represents a parsed IRC message with command, ordered middle parameters, and an
+      optional trailing parameter while preserving parameter contents.
+  - id: AC-037
+    description: IRCDto distinguishes absent parameters from empty values and supports the maximum parameter
+      count defined by the parser contract.
+  tasks:
+  - id: T-031
+    description: Implement IRCDto struct
+- id: FEAT-009
+  name: ISecurityFilter and SecurityFilterFactory
+  related_elements:
+  - security_filtering.mmd
+  depends_on:
+  - FEAT-001
+  - FEAT-007
+  - FEAT-006
+  acceptance_criteria:
+  - id: AC-038
+    description: ISecurityFilter defines a consistent contract for evaluating whether a client may execute
+      a command in the current server state.
+  - id: AC-039
+    description: SecurityFilterFactory constructs individual filters and composes multiple filters into
+      a deterministic chain.
+  - id: AC-040
+    description: Filter-chain evaluation stops at the first rejection and allows the command only when
+      every configured filter accepts it.
+  - id: AC-041
+    description: Invalid filter configuration or an attempted filter evaluation with an invalid client/context
+      raises the appropriate business exception.
+  tasks:
+  - id: T-032
+    description: Implement ISecurityFilter
+  - id: T-033
+    description: Tests SecurityFilterFactory(throws)
+  - id: T-034
+    description: Implement SecurityFilterFactory
+  - id: T-035
+    description: Refactor SecurityFilterFactory
+- id: FEAT-010
+  name: ICommand and CommandFactory
+  related_elements:
+  - command_subsystem.mmd
+  depends_on:
+  - FEAT-001
+  - FEAT-007
+  - FEAT-006
+  - FEAT-009
+  acceptance_criteria:
+  - id: AC-042
+    description: ICommand defines a consistent execution contract receiving the parsed IRC message and
+      the client/server context required by command handlers.
+  - id: AC-043
+    description: CommandFactory resolves supported command names case-insensitively and creates the corresponding
+      command implementation.
+  - id: AC-044
+    description: Unknown or unsupported command names are represented by the appropriate business exception
+      or protocol-level unknown-command result, never by a null command or undefined behavior.
+  - id: AC-045
+    description: Invalid command construction arguments or inconsistent factory registration raise an
+      appropriate business exception.
+  tasks:
+  - id: T-036
+    description: Implement ICommand
+  - id: T-037
+    description: Tests CommandFactory(throws)
+  - id: T-038
+    description: Implement CommandFactory
+  - id: T-039
+    description: Refactor CommandFactory
+- id: FEAT-011
+  name: Command Parser
+  related_elements:
+  - command_subsystem.mmd
+  depends_on:
+  - FEAT-008
+  - FEAT-001
+  acceptance_criteria:
+  - id: AC-046
+    description: CommandParser converts a raw IRC input line into a command name, ordered middle parameters,
+      and an optional trailing parameter.
+  - id: AC-047
+    description: Parsing preserves spaces inside the trailing parameter, removes only protocol delimiters,
+      and handles CRLF framing according to the network input contract.
+  - id: AC-048
+    description: Parser rejects malformed lines, empty command names, invalid parameter layouts, and messages
+      exceeding IRC protocol length/parameter limits.
+  - id: AC-049
+    description: Malformed or incomplete input raises a typed parsing/business exception that lets the
+      caller decide whether to send an IRC error or close the connection.
+  tasks:
+  - id: T-040
+    description: Tests CommandParser
+  - id: T-041
+    description: Implement CommandParser
+  - id: T-042
+    description: Refactor CommandParser
+- id: FEAT-012
+  name: Command management (CommandSystem)
+  related_elements:
+  - command_subsystem.mmd
+  depends_on:
+  - FEAT-010
+  - FEAT-011
+  acceptance_criteria:
+  - id: AC-050
+    description: CommandSystem obtains complete IRC messages from the input buffer, parses them, resolves
+      commands through CommandFactory, and dispatches them in input order.
+  - id: AC-051
+    description: CommandSystem applies the configured security-filter chain before executing a command
+      and does not execute rejected commands.
+  - id: AC-052
+    description: Multiple complete messages in one input buffer are dispatched independently, while incomplete
+      trailing data remains buffered for the next read.
+  - id: AC-053
+    description: Command execution failures are isolated to the relevant message/client and are converted
+      into the appropriate IRC error response without terminating the whole server loop.
+  - id: AC-054
+    description: Parser, command lookup, authorization, and command execution failures propagate as the
+      appropriate typed business exceptions to the protocol error-handling boundary.
+  tasks:
+  - id: T-043
+    description: Tests Command System
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-044
+    description: Implement Command System
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-045
+    description: Refactor Command System
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd
+- id: FEAT-013
+  name: ISocketService
+  related_elements:
+  - server.mmd
+  depends_on: []
+  acceptance_criteria:
+  - id: AC-055
+    description: TickResult carries outbound bytes/messages and the socket descriptors scheduled for closure
+      without conflating the two result categories.
+  - id: AC-056
+    description: ISocketService defines the event-loop tick contract and exposes the inputs/outputs needed
+      by the server without prescribing a concrete socket implementation.
+  tasks:
+  - id: T-046
+    description: Tests TickResult
+    tdd_step: Red
+    related_elements:
+    - server.mmd
+  - id: T-047
+    description: Implement TickResult
+    tdd_step: Green
+    related_elements:
+    - server.mmd
+  - id: T-048
+    description: Refactor TickResult
+    tdd_step: Refactor
+    related_elements:
+    - server.mmd
+  - id: T-049
+    description: Tests ISocketService
+    tdd_step: Red
+    related_elements:
+    - server.mmd
+  - id: T-050
+    description: Implement ISocketService
+    tdd_step: Green
+    related_elements:
+    - server.mmd
+  - id: T-051
+    description: Refactor ISocketService
+    tdd_step: Refactor
+    related_elements:
+    - server.mmd
+- id: FEAT-014
+  name: Socket server
+  related_elements:
+  - server.mmd
+  depends_on:
+  - FEAT-013
+  - FEAT-001
+  acceptance_criteria:
+  - id: AC-057
+    description: SocketServer binds and listens on the configured address and port, and reports startup
+      failures without leaving partially initialized sockets.
+  - id: AC-058
+    description: New connections are accepted non-blockingly and each accepted connection is assigned
+      a valid descriptor and initialized client state.
+  - id: AC-059
+    description: A single poll-based event loop monitors listening, readable, and writable sockets without
+      blocking on an individual client.
+  - id: AC-060
+    description: Readable events append received bytes to the corresponding client input buffer; writable
+      events send queued bytes and preserve unsent data after partial writes.
+  - id: AC-061
+    description: Hangups, peer disconnects, and socket errors close the affected connection and trigger
+      client cleanup without stopping the server.
+  - id: AC-062
+    description: Socket setup, accept, poll, read, and write failures are surfaced as appropriate typed
+      business/system exceptions and handled without corrupting other clients.
+  tasks:
+  - id: T-052
+    description: Tests SocketServer
+    tdd_step: Red
+    related_elements:
+    - server.mmd
+  - id: T-053
+    description: Implement SocketServer
+    tdd_step: Green
+    related_elements:
+    - server.mmd
+  - id: T-054
+    description: Refactor SocketServer
+    tdd_step: Refactor
+    related_elements:
+    - server.mmd
+- id: FEAT-015
+  name: IRCService
+  related_elements:
+  - server.mmd
+  depends_on:
+  - FEAT-013
+  - FEAT-012
+  - FEAT-007
+  - FEAT-006
+  acceptance_criteria:
+  - id: AC-063
+    description: IRCService implements the ISocketService tick contract and coordinates socket events
+      with ClientSystem and CommandSystem.
+  - id: AC-064
+    description: Each tick processes newly accepted connections, readable client data, pending IRC commands,
+      queued output, and requested socket closures in a deterministic order.
+  - id: AC-065
+    description: IRCService queues protocol replies for the correct client and does not perform blocking
+      writes or lose data after partial writes.
+  - id: AC-066
+    description: Disconnects and command failures are isolated to the affected client while the service
+      continues processing other clients.
+  - id: AC-067
+    description: Invalid tick state, unknown client references, and unrecoverable service-level failures
+      raise appropriate typed business exceptions.
+  tasks:
+  - id: T-055
+    description: Tests IRCService
+    tdd_step: Red
+    related_elements:
+    - server.mmd
+  - id: T-056
+    description: Implement IRCService
+    tdd_step: Green
+    related_elements:
+    - server.mmd
+  - id: T-057
+    description: Refactor IRCService
+    tdd_step: Refactor
+    related_elements:
+    - server.mmd
+- id: FEAT-016
+  name: PASS command
+  related_elements:
+  - client_subsystem.mmd
+  depends_on:
+  - FEAT-010
+  - FEAT-007
+  acceptance_criteria:
+  - id: AC-068
+    description: PASS accepts the server password only with the required parameter and records successful
+      authentication for the issuing connection.
+  - id: AC-069
+    description: PASS rejects missing or incorrect passwords and does not mark the client authenticated
+      on failure.
+  - id: AC-070
+    description: PASS is processed before registration completion and is not accepted as a way to change
+      credentials after registration has completed.
+  - id: AC-071
+    description: The server sends the appropriate numeric error for missing parameters or an invalid password
+      and does not expose the configured password in replies or logs.
+  - id: AC-072
+    description: PASS validation and authentication-state failures raise the appropriate business exceptions
+      for translation into IRC numeric replies.
+  tasks:
+  - id: T-058
+    description: Tests PASS command
+    tdd_step: Red
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-059
+    description: Implement PASS command
+    tdd_step: Green
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-060
+    description: Refactor PASS command
+    tdd_step: Refactor
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-061
+    description: Tests PASS command in CommandFactory
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-062
+    description: Implement PASS command in CommandFactory
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-063
+    description: Refactor PASS command in CommandFactory
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd
+- id: FEAT-017
+  name: QUIT command
+  related_elements: []
+  depends_on:
+  - FEAT-010
+  - FEAT-007
+  - FEAT-006
+  acceptance_criteria:
+  - id: AC-073
+    description: QUIT terminates only the issuing client's connection and accepts an optional trailing
+      quit message.
+  - id: AC-074
+    description: QUIT removes the client from all joined channels, releases its nickname, removes it from
+      client registries, and schedules its socket for closure.
+  - id: AC-075
+    description: QUIT broadcasts one correctly formatted QUIT message to the client's former channel peers
+      before membership cleanup makes that information unavailable.
+  - id: AC-076
+    description: QUIT cleanup is safe when invoked more than once or when the client has already disconnected.
+  - id: AC-077
+    description: Unknown-client or invalid lifecycle conditions encountered during QUIT raise the appropriate
+      business exception and do not corrupt other clients' state.
+  tasks:
+  - id: T-064
+    description: Tests QUIT command
+    tdd_step: Red
+    related_elements: []
+  - id: T-065
+    description: Implement QUIT command
+    tdd_step: Green
+    related_elements: []
+  - id: T-066
+    description: Refactor QUIT command
+    tdd_step: Refactor
+    related_elements: []
+  - id: T-067
+    description: Tests QUIT command in CommandFactory
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-068
+    description: Implement QUIT command in CommandFactory
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-069
+    description: Refactor QUIT command in CommandFactory
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd
+- id: FEAT-018
+  name: PING command
+  related_elements: []
+  depends_on:
+  - FEAT-010
+  - FEAT-007
+  acceptance_criteria:
+  - id: AC-078
+    description: PING requires a token and returns a PONG containing the same token and the correct server
+      prefix/target information.
+  - id: AC-079
+    description: PING can be processed for a connected client without changing its registration, nickname,
+      or channel state.
+  - id: AC-080
+    description: PING with missing or malformed parameters produces the appropriate IRC numeric error
+      rather than silently succeeding.
+  - id: AC-081
+    description: Invalid client context or invalid PING state raises the appropriate business exception
+      for protocol-level error handling.
+  tasks:
+  - id: T-070
+    description: Tests PING command
+    tdd_step: Red
+    related_elements: []
+  - id: T-071
+    description: Implement PING command
+    tdd_step: Green
+    related_elements: []
+  - id: T-072
+    description: Refactor PING command
+    tdd_step: Refactor
+    related_elements: []
+  - id: T-073
+    description: Tests PING command in CommandFactory
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-074
+    description: Implement PING command in CommandFactory
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-075
+    description: Refactor PING command in CommandFactory
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd
+- id: FEAT-019
+  name: AuthenticatedFilter
+  related_elements:
+  - security_filtering.mmd
+  depends_on:
+  - FEAT-009
+  - FEAT-007
+  acceptance_criteria:
+  - id: AC-082
+    description: AuthenticatedFilter allows commands only when the issuing client has successfully authenticated
+      with the configured server password.
+  - id: AC-083
+    description: AuthenticatedFilter rejects unauthenticated clients for commands that require authentication
+      while permitting explicitly allowed registration/authentication commands.
+  - id: AC-084
+    description: Filter decisions are based on the current client state and cannot be bypassed by stale
+      cached authentication data.
+  - id: AC-085
+    description: Invalid client references or inconsistent authentication state raise the appropriate
+      business exception rather than being treated as authenticated.
+  tasks:
+  - id: T-076
+    description: Tests AuthenticatedFilter
+    tdd_step: Red
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-077
+    description: Implement AuthenticatedFilter
+    tdd_step: Green
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-078
+    description: Refactor AuthenticatedFilter
+    tdd_step: Refactor
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-079
+    description: Tests AuthenticatedFilter in SecurityFilterFactory
+    tdd_step: Red
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-080
+    description: Implement AuthenticatedFilter in SecurityFilterFactory
+    tdd_step: Green
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-081
+    description: Refactor AuthenticatedFilter in SecurityFilterFactory
+    tdd_step: Refactor
+    related_elements:
+    - client_subsystem.mmd
+- id: FEAT-020
+  name: NICK command
+  related_elements:
+  - client_subsystem.mmd
+  depends_on:
+  - FEAT-010
+  - FEAT-007
+  - FEAT-019
+  - FEAT-006
+  acceptance_criteria:
+  - id: AC-086
+    description: NICK sets a valid nickname for the issuing client and broadcasts the correctly formatted
+      nickname change to the client and relevant channel peers.
+  - id: AC-087
+    description: NICK enforces nickname syntax, length, and case-insensitive uniqueness across connected
+      clients.
+  - id: AC-088
+    description: Changing a nickname updates Client, NickManager, ClientRegistry, and any nickname-based
+      lookup consistently and atomically.
+  - id: AC-089
+    description: NICK supports the server's defined registration behavior for clients that have not yet
+      completed registration.
+  - id: AC-090
+    description: Missing, invalid, or already-in-use nicknames raise the corresponding business exceptions
+      and produce the appropriate IRC numeric replies.
+  tasks:
+  - id: T-082
+    description: Tests NICK command
+    tdd_step: Red
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-083
+    description: Implement NICK command
+    tdd_step: Green
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-084
+    description: Refactor NICK command
+    tdd_step: Refactor
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-085
+    description: Tests NICK command in CommandFactory
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-086
+    description: Implement NICK command in CommandFactory
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-087
+    description: Refactor NICK command in CommandFactory
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd
+- id: FEAT-021
+  name: USER command
+  related_elements:
+  - client_subsystem.mmd
+  depends_on:
+  - FEAT-010
+  - FEAT-007
+  - FEAT-019
+  acceptance_criteria:
+  - id: AC-091
+    description: USER accepts the required username, mode, unused parameter, and trailing real name in
+      the protocol-defined parameter positions.
+  - id: AC-092
+    description: USER stores the username and real name on the issuing client and contributes to registration
+      completion without overwriting unrelated registration state.
+  - id: AC-093
+    description: USER rejects missing parameters and disallows changes after registration when required
+      by the server's registration policy.
+  - id: AC-094
+    description: Successful USER processing triggers registration completion exactly once when all required
+      registration conditions are satisfied.
+  - id: AC-095
+    description: Missing parameters, duplicate registration, or invalid registration state raise the appropriate
+      business exceptions and map to the corresponding IRC numeric replies.
+  tasks:
+  - id: T-088
+    description: Tests USER command
+    tdd_step: Red
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-089
+    description: Implement USER command
+    tdd_step: Green
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-090
+    description: Refactor USER command
+    tdd_step: Refactor
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-091
+    description: Tests USER command in CommandFactory
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-092
+    description: Implement USER command in CommandFactory
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-093
+    description: Refactor USER command in CommandFactory
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd
+- id: FEAT-022
+  name: RegisteredFilter
+  related_elements:
+  - security_filtering.mmd
+  depends_on:
+  - FEAT-009
+  - FEAT-007
+  acceptance_criteria:
+  - id: AC-096
+    description: RegisteredFilter allows commands only when the client has completed the server's full
+      registration sequence.
+  - id: AC-097
+    description: RegisteredFilter rejects commands from partially registered clients while allowing the
+      commands explicitly permitted before registration.
+  - id: AC-098
+    description: Registration status is evaluated from the authoritative current client state.
+  - id: AC-099
+    description: Invalid client references or impossible registration states raise the appropriate business
+      exception instead of allowing the command.
+  tasks:
+  - id: T-094
+    description: Tests RegisteredFilter
+    tdd_step: Red
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-095
+    description: Implement RegisteredFilter
+    tdd_step: Green
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-096
+    description: Refactor RegisteredFilter
+    tdd_step: Refactor
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-097
+    description: Tests RegisteredFilter in SecurityFilterFactory
+    tdd_step: Red
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-098
+    description: Implement RegisteredFilter in SecurityFilterFactory
+    tdd_step: Green
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-099
+    description: Refactor RegisteredFilter in SecurityFilterFactory
+    tdd_step: Refactor
+    related_elements:
+    - client_subsystem.mmd
+- id: FEAT-023
+  name: ChainFilter
+  related_elements:
+  - security_filtering.mmd
+  depends_on:
+  - FEAT-009
+  acceptance_criteria:
+  - id: AC-100
+    description: ChainFilter evaluates configured filters in their declared order and stops immediately
+      when a filter rejects the request.
+  - id: AC-101
+    description: ChainFilter allows execution only when every filter in the chain accepts the same client
+      and command context.
+  - id: AC-102
+    description: An empty chain follows a documented deterministic policy and does not produce undefined
+      behavior.
+  - id: AC-103
+    description: Exceptions raised by a filter are propagated to the command error boundary and are not
+      converted into an accidental allow decision.
+  - id: AC-104
+    description: Invalid filter entries or invalid evaluation context raise the appropriate business exception.
+  tasks:
+  - id: T-100
+    description: Tests ChainFilter
+    tdd_step: Red
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-101
+    description: Implement ChainFilter
+    tdd_step: Green
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-102
+    description: Refactor ChainFilter
+    tdd_step: Refactor
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-103
+    description: Tests ChainFilter in SecurityFilterFactory
+    tdd_step: Red
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-104
+    description: Implement ChainFilter in SecurityFilterFactory
+    tdd_step: Green
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-105
+    description: Refactor ChainFilter in SecurityFilterFactory
+    tdd_step: Refactor
+    related_elements:
+    - client_subsystem.mmd
+- id: FEAT-024
+  name: getCommonAccessFilter in factory
+  related_elements:
+  - client_subsystem.mmd
+  depends_on:
+  - FEAT-023
+  - FEAT-019
+  - FEAT-022
+  acceptance_criteria:
+  - id: AC-105
+    description: getCommonAccessFilter returns a chain containing the common authentication and registration
+      checks in the documented order.
+  - id: AC-106
+    description: The factory returns an equivalent configured chain for repeated calls and does not share
+      mutable per-client evaluation state between clients.
+  - id: AC-107
+    description: Every filter returned by the factory is applicable to the command/client context supported
+      by the security-filter contract.
+  - id: AC-108
+    description: Missing dependencies or invalid common-filter configuration raise an appropriate business
+      exception instead of returning a partially configured chain.
+  tasks:
+  - id: T-106
+    description: Tests getCommonAccessFilter in SecurityFilterFactory
+    tdd_step: Red
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-107
+    description: Implement getCommonAccessFilter in SecurityFilterFactory
+    tdd_step: Green
+    related_elements:
+    - client_subsystem.mmd
+  - id: T-108
+    description: Refactor getCommonAccessFilter in SecurityFilterFactory
+    tdd_step: Refactor
+    related_elements:
+    - client_subsystem.mmd
+- id: FEAT-025
+  name: JOIN command
+  related_elements:
+  - channel_subsystem.mmd
+  depends_on:
+  - FEAT-010
+  - FEAT-007
+  - FEAT-024
+  - FEAT-006
+  acceptance_criteria:
+  - id: AC-109
+    description: JOIN accepts one or more valid channel names and joins the issuing client to each channel
+      according to the server's supported parameter rules.
+  - id: AC-110
+    description: JOIN creates a channel when it does not exist and adds the client exactly once when it
+      does exist.
+  - id: AC-111
+    description: JOIN enforces channel key, invite-only, user-limit, and other implemented access modes
+      before changing membership.
+  - id: AC-112
+    description: After a successful join, the server broadcasts JOIN to channel members and sends the
+      joining client the channel topic and names list.
+  - id: AC-113
+    description: JOIN rejects invalid channel names, duplicate/ineligible membership, incorrect keys,
+      invite restrictions, and full channels with the corresponding business exceptions and IRC numeric
+      replies.
+  tasks:
+  - id: T-109
+    description: Tests JOIN command
+    tdd_step: Red
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-110
+    description: Implement JOIN command
+    tdd_step: Green
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-111
+    description: Refactor JOIN command
+    tdd_step: Refactor
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-112
+    description: Tests JOIN command in CommandFactory
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-113
+    description: Implement JOIN command in CommandFactory
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-114
+    description: Refactor JOIN command in CommandFactory
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd
+- id: FEAT-026
+  name: LIST command
+  related_elements:
+  - channel_subsystem.mmd
+  depends_on:
+  - FEAT-010
+  - FEAT-007
+  - FEAT-024
+  - FEAT-006
+  acceptance_criteria:
+  - id: AC-114
+    description: LIST returns the channels visible to the requesting client and includes each channel's
+      name, user count, and topic.
+  - id: AC-115
+    description: LIST supports the server's documented optional channel-list parameter and does not disclose
+      channels hidden by applicable visibility rules.
+  - id: AC-116
+    description: LIST emits the appropriate start, per-channel, and end numeric replies in protocol order,
+      including an empty result when no channels match.
+  - id: AC-117
+    description: Invalid channel-list parameters or invalid client context raise the appropriate business
+      exception and produce a protocol-level error where applicable.
+  tasks:
+  - id: T-115
+    description: Tests LIST command
+    tdd_step: Red
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-116
+    description: Implement LIST command
+    tdd_step: Green
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-117
+    description: Refactor LIST command
+    tdd_step: Refactor
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-118
+    description: Tests LIST command in CommandFactory
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-119
+    description: Implement LIST command in CommandFactory
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-120
+    description: Refactor LIST command in CommandFactory
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd
+- id: FEAT-027
+  name: ChannelMemberFilter
+  related_elements:
+  - security_filtering.mmd
+  depends_on:
+  - FEAT-009
+  - FEAT-007
+  - FEAT-006
+  acceptance_criteria:
+  - id: AC-118
+    description: ChannelMemberFilter allows a command only when the issuing client is a member of the
+      target channel.
+  - id: AC-119
+    description: ChannelMemberFilter rejects non-members for member-only operations and identifies the
+      target channel consistently from the command context.
+  - id: AC-120
+    description: Commands explicitly permitted for non-members are not blocked by this filter.
+  - id: AC-121
+    description: Missing channels, unknown clients, or invalid command/channel context raise the appropriate
+      business exception rather than granting access.
+  tasks:
+  - id: T-121
+    description: Tests ChannelMemberFilter
+    tdd_step: Red
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-122
+    description: Implement ChannelMemberFilter
+    tdd_step: Green
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-123
+    description: Refactor ChannelMemberFilter
+    tdd_step: Refactor
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-124
+    description: Tests ChannelMemberFilter in SecurityFilterFactory
+    tdd_step: Red
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-125
+    description: Implement ChannelMemberFilter in SecurityFilterFactory
+    tdd_step: Green
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-126
+    description: Refactor ChannelMemberFilter in SecurityFilterFactory
+    tdd_step: Refactor
+    related_elements:
+    - channel_subsystem.mmd
+- id: FEAT-028
+  name: getChannelCommonAccessFilter in factory
+  related_elements:
+  - channel_subsystem.mmd
+  depends_on:
+  - FEAT-024
+  - FEAT-027
+  acceptance_criteria:
+  - id: AC-122
+    description: getChannelCommonAccessFilter returns the documented channel-level access chain and includes
+      the channel-membership check in the correct order.
+  - id: AC-123
+    description: The returned chain evaluates the target channel and issuing client from the current command
+      context.
+  - id: AC-124
+    description: Repeated factory calls do not leak mutable state or alter the behavior of previously
+      created chains.
+  - id: AC-125
+    description: Missing filter dependencies or invalid channel-filter configuration raise an appropriate
+      business exception.
+  tasks:
+  - id: T-127
+    description: Tests getChannelCommonAccessFilter in SecurityFilterFactory
+    tdd_step: Red
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-128
+    description: Implement getChannelCommonAccessFilter in SecurityFilterFactory
+    tdd_step: Green
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-129
+    description: Refactor getChannelCommonAccessFilter in SecurityFilterFactory
+    tdd_step: Refactor
+    related_elements:
+    - channel_subsystem.mmd
+- id: FEAT-029
+  name: PRIVMSG command
+  related_elements:
+  - command_subsystem.mmd
+  depends_on:
+  - FEAT-010
+  - FEAT-007
+  - FEAT-028
+  - FEAT-006
+  acceptance_criteria:
+  - id: AC-126
+    description: PRIVMSG delivers a message addressed to a nickname to exactly that connected recipient
+      and does not echo it to unrelated clients.
+  - id: AC-127
+    description: PRIVMSG delivers a message addressed to a channel to all eligible channel members except
+      the sender.
+  - id: AC-128
+    description: PRIVMSG preserves the trailing message text, including embedded spaces, and uses the
+      correct IRC prefix and target in the forwarded message.
+  - id: AC-129
+    description: PRIVMSG rejects missing recipient/text, unknown nicknames/channels, and attempts to message
+      a channel without required membership with the corresponding IRC numeric errors.
+  - id: AC-130
+    description: Invalid targets, empty message text, and unauthorized channel messaging raise the appropriate
+      typed business exceptions.
+  tasks:
+  - id: T-130
+    description: Tests PRIVMSG command
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-131
+    description: Implement PRIVMSG command
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-132
+    description: Refactor PRIVMSG command
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-133
+    description: Tests PRIVMSG command in CommandFactory
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-134
+    description: Implement PRIVMSG command in CommandFactory
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-135
+    description: Refactor PRIVMSG command in CommandFactory
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd
+- id: FEAT-030
+  name: PART command
+  related_elements:
+  - channel_subsystem.mmd
+  depends_on:
+  - FEAT-010
+  - FEAT-007
+  - FEAT-028
+  - FEAT-006
+  acceptance_criteria:
+  - id: AC-131
+    description: PART removes the issuing client from each specified channel and accepts an optional trailing
+      part message.
+  - id: AC-132
+    description: PART broadcasts the correctly formatted PART message to channel members before removing
+      the client from the channel.
+  - id: AC-133
+    description: PART supports multiple channel targets according to the server's parameter rules and
+      does not alter membership in unrelated channels.
+  - id: AC-134
+    description: PART rejects unknown channels and clients that are not members with the corresponding
+      IRC numeric replies.
+  - id: AC-135
+    description: Invalid channel parameters or inconsistent membership state raise the appropriate business
+      exceptions.
+  tasks:
+  - id: T-136
+    description: Tests PART command
+    tdd_step: Red
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-137
+    description: Implement PART command
+    tdd_step: Green
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-138
+    description: Refactor PART command
+    tdd_step: Refactor
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-139
+    description: Tests PART command in CommandFactory
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-140
+    description: Implement PART command in CommandFactory
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-141
+    description: Refactor PART command in CommandFactory
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd
+- id: FEAT-031
+  name: ChannelOperatorFilter
+  related_elements:
+  - security_filtering.mmd
+  depends_on:
+  - FEAT-009
+  - FEAT-007
+  - FEAT-006
+  acceptance_criteria:
+  - id: AC-136
+    description: ChannelOperatorFilter allows operator-only operations only when the issuing client is
+      an operator of the target channel.
+  - id: AC-137
+    description: ChannelOperatorFilter rejects ordinary members and non-members for operator-only operations.
+  - id: AC-138
+    description: Operator status is read from authoritative channel membership state and takes effect
+      immediately after promotion or demotion.
+  - id: AC-139
+    description: Missing channels, unknown clients, or invalid operator-check context raise the appropriate
+      business exception.
+  tasks:
+  - id: T-142
+    description: Tests ChannelOperatorFilter
+    tdd_step: Red
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-143
+    description: Implement ChannelOperatorFilter
+    tdd_step: Green
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-144
+    description: Refactor ChannelOperatorFilter
+    tdd_step: Refactor
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-145
+    description: Tests ChannelOperatorFilter in SecurityFilterFactory
+    tdd_step: Red
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-146
+    description: Implement ChannelOperatorFilter in SecurityFilterFactory
+    tdd_step: Green
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-147
+    description: Refactor ChannelOperatorFilter in SecurityFilterFactory
+    tdd_step: Refactor
+    related_elements:
+    - channel_subsystem.mmd
+- id: FEAT-032
+  name: getChannelOperatorAccessFilter in factory
+  related_elements:
+  - channel_subsystem.mmd
+  depends_on:
+  - FEAT-028
+  - FEAT-031
+  acceptance_criteria:
+  - id: AC-140
+    description: getChannelOperatorAccessFilter returns a channel access chain that enforces channel membership
+      and operator privileges in the documented order.
+  - id: AC-141
+    description: The returned chain denies operator-only operations to clients without operator status
+      and permits authorized channel operators.
+  - id: AC-142
+    description: Factory-created chains do not retain client-specific authorization state between command
+      executions.
+  - id: AC-143
+    description: Missing dependencies or invalid operator-filter configuration raise an appropriate business
+      exception.
+  tasks:
+  - id: T-148
+    description: Tests getChannelOperatorAccessFilter in SecurityFilterFactory
+    tdd_step: Red
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-149
+    description: Implement getChannelOperatorAccessFilter in SecurityFilterFactory
+    tdd_step: Green
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-150
+    description: Refactor getChannelOperatorAccessFilter in SecurityFilterFactory
+    tdd_step: Refactor
+    related_elements:
+    - channel_subsystem.mmd
+- id: FEAT-033
+  name: KICK command
+  related_elements:
+  - channel_subsystem.mmd
+  depends_on:
+  - FEAT-010
+  - FEAT-007
+  - FEAT-032
+  - FEAT-006
+  acceptance_criteria:
+  - id: AC-144
+    description: KICK removes the specified target client from the specified channel and accepts an optional
+      trailing reason.
+  - id: AC-145
+    description: KICK broadcasts the correctly formatted KICK message to channel members before membership
+      removal.
+  - id: AC-146
+    description: KICK requires the issuer to be a channel operator and validates that both issuer and
+      target belong to the channel.
+  - id: AC-147
+    description: KICK handles multiple targets/channels only if supported by the server's documented parameter
+      rules and otherwise rejects unsupported parameter combinations.
+  - id: AC-148
+    description: KICK reports missing parameters, unknown channel/nickname, non-membership, and insufficient
+      privileges using the corresponding IRC numeric replies and typed business exceptions.
+  tasks:
+  - id: T-151
+    description: Tests KICK command
+    tdd_step: Red
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-152
+    description: Implement KICK command
+    tdd_step: Green
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-153
+    description: Refactor KICK command
+    tdd_step: Refactor
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-154
+    description: Tests KICK command in CommandFactory
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-155
+    description: Implement KICK command in CommandFactory
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-156
+    description: Refactor KICK command in CommandFactory
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd
+- id: FEAT-034
+  name: MODE command
+  related_elements:
+  - channel_subsystem.mmd
+  depends_on:
+  - FEAT-010
+  - FEAT-007
+  - FEAT-032
+  - FEAT-006
+  acceptance_criteria:
+  - id: AC-149
+    description: MODE reports the current supported channel modes when queried without a mode change.
+  - id: AC-150
+    description: MODE correctly enables and disables the supported modes i, t, k, o, and l, including
+      required mode parameters.
+  - id: AC-151
+    description: MODE enforces channel-operator privileges for mode changes and validates keys, limits,
+      targets, and mode parameter counts.
+  - id: AC-152
+    description: Successful mode changes update channel state atomically and broadcast the correctly formatted
+      MODE message to channel members.
+  - id: AC-153
+    description: Unsupported modes, missing/extra parameters, unknown channels/nicknames, and insufficient
+      privileges raise the appropriate business exceptions and IRC numeric replies.
+  tasks:
+  - id: T-157
+    description: Tests MODE command
+    tdd_step: Red
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-158
+    description: Implement MODE command
+    tdd_step: Green
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-159
+    description: Refactor MODE command
+    tdd_step: Refactor
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-160
+    description: Tests MODE command in CommandFactory
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-161
+    description: Implement MODE command in CommandFactory
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-162
+    description: Refactor MODE command in CommandFactory
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd
+- id: FEAT-035
+  name: TOPIC command
+  related_elements:
+  - channel_subsystem.mmd
+  depends_on:
+  - FEAT-010
+  - FEAT-007
+  - FEAT-032
+  - FEAT-006
+  acceptance_criteria:
+  - id: AC-154
+    description: TOPIC without a topic parameter returns the current channel topic, including the correct
+      no-topic response when none is set.
+  - id: AC-155
+    description: TOPIC with a trailing parameter sets or clears the channel topic according to the server's
+      supported semantics.
+  - id: AC-156
+    description: When the topic-restricted mode is enabled, only channel operators may change the topic;
+      otherwise channel members follow the server's documented policy.
+  - id: AC-157
+    description: Successful topic changes update channel state and broadcast the correctly formatted TOPIC
+      message to channel members.
+  - id: AC-158
+    description: Unknown channels, non-members, insufficient privileges, or malformed parameters raise
+      the appropriate business exceptions and IRC numeric replies.
+  tasks:
+  - id: T-163
+    description: Tests TOPIC command
+    tdd_step: Red
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-164
+    description: Implement TOPIC command
+    tdd_step: Green
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-165
+    description: Refactor TOPIC command
+    tdd_step: Refactor
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-166
+    description: Tests TOPIC command in CommandFactory
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-167
+    description: Implement TOPIC command in CommandFactory
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-168
+    description: Refactor TOPIC command in CommandFactory
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd
+- id: FEAT-036
+  name: INVITE command
+  related_elements:
+  - channel_subsystem.mmd
+  depends_on:
+  - FEAT-010
+  - FEAT-007
+  - FEAT-032
+  - FEAT-006
+  acceptance_criteria:
+  - id: AC-159
+    description: INVITE records an invitation from an authorized channel operator to a target nickname
+      for a specific invite-only channel.
+  - id: AC-160
+    description: INVITE sends the appropriate confirmation to the inviter and invitation notification
+      to the invitee.
+  - id: AC-161
+    description: INVITE enforces issuer membership/operator rules and validates that the target exists
+      and is not already a channel member.
+  - id: AC-162
+    description: An invitation permits the invited client to pass the invite-only join check and is consumed
+      or retained according to the server's documented invitation policy.
+  - id: AC-163
+    description: Missing parameters, unknown nicknames/channels, existing membership, and insufficient
+      privileges raise the corresponding business exceptions and IRC numeric replies.
+  tasks:
+  - id: T-169
+    description: Tests INVITE command
+    tdd_step: Red
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-170
+    description: Implement INVITE command
+    tdd_step: Green
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-171
+    description: Refactor INVITE command
+    tdd_step: Refactor
+    related_elements:
+    - channel_subsystem.mmd
+  - id: T-172
+    description: Tests INVITE command in CommandFactory
+    tdd_step: Red
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-173
+    description: Implement INVITE command in CommandFactory
+    tdd_step: Green
+    related_elements:
+    - command_subsystem.mmd
+  - id: T-174
+    description: Refactor INVITE command in CommandFactory
+    tdd_step: Refactor
+    related_elements:
+    - command_subsystem.mmd

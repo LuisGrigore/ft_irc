@@ -1,0 +1,82 @@
+classDiagram
+  namespace g1 {
+    class ConcreteFilters
+  }
+  class SecurityFilterFactory {
+    - ClientManager& clientManager
+    - ChannelSystem& channelSystem
+    + SecurityFilterFactory(ClientManager& clientManager, ChannelSystem& channelSystem)
+    + ~SecurityFilterFactory()
+    + ISecurityFilter* getAuthenticatedFilter(int fd)
+    + ISecurityFilter* getRegisteredFilter(int fd)
+    + ISecurityFilter* getCommonAccessFilter(int fd)
+    + ISecurityFilter* getChannelCommonAccessFilter(int fd, const std::string& channelName)
+    + ISecurityFilter* getChannelOperatorAccessFilter(int fd, const std::string& channelName)
+    + ISecurityFilter* getChainFilter(std::vector~ISecurityFilter*~& filters)
+  }
+  class ISecurityFilter {
+    <<interface>>
+    + ISecurityFilter()
+    + virtual ~ISecurityFilter()
+    + virtual void handle() = 0
+  }
+  class AuthenticatedFilter {
+    - ClientManager& clientManager
+    - int fd
+    + AuthenticatedFilter(ClientManager& clientManager, int fd)
+    + virtual ~AuthenticatedFilter()
+    + virtual void handle()
+  }
+  class RegisteredFilter {
+    - ClientManager& clientManager
+    - int fd
+    + RegisteredFilter(ClientManager& clientManager, int fd)
+    + virtual ~RegisteredFilter()
+    + virtual void handle()
+  }
+  class ChainFilter {
+    - std::vector~ISecurityFilter*~ filters
+    + ChainFilter()
+    + ChainFilter(std::vector~ISecurityFilter*~& filters)
+    + ~ChainFilter()
+    + void addFilter(ISecurityFilter& filter)
+    + virtual void handle()
+  }
+  class ChannelMemberFilter {
+    - ChannelSystem& channelSystem
+    - ClientManager& clientManager
+    - int fd
+    - std::string channelName
+    + ChannelMemberFilter(ChannelSystem& channelSystem, ClientManager& clientManager, int fd, const std::string& channelName)
+    + virtual ~ChannelMemberFilter()
+    + virtual void handle()
+  }
+  class ChannelOperatorFilter {
+    - ChannelSystem& channelSystem
+    - ClientManager& clientManager
+    - int fd
+    - std::string channelName
+    + ChannelOperatorFilter(ChannelSystem& channelSystem, ClientManager& clientManager, int fd, const std::string& channelName)
+    + virtual ~ChannelOperatorFilter()
+    + virtual void handle()
+  }
+  class ChannelSystem {
+    <<external>>
+    "This class is defined in the "channel_subsystem" diagram"
+  }
+  class ClientSystem {
+    <<external>>
+    "This class is defined in the "client_subsystem" diagram"
+  }
+  class g1
+  style SecurityFilterFactory stroke:#82b366
+
+  SecurityFilterFactory ..> ISecurityFilter : returns
+  SecurityFilterFactory o-- ClientSystem : injects
+  SecurityFilterFactory o-- ChannelSystem : injects
+  g1 --|> ISecurityFilter : implements
+  SecurityFilterFactory ..> g1 : creates
+  g1 o-- ClientSystem : uses
+  g1 o-- ChannelSystem : uses
+%% graph:positions {"g1":{"x":1187,"y":-456,"w":976,"h":672},"ConcreteFilters":{"x":395,"y":0},"SecurityFilterFactory":{"x":-11,"y":-288,"w":654,"h":235},"ISecurityFilter":{"x":755,"y":-312,"w":232,"h":118},"AuthenticatedFilter":{"x":1223,"y":-396,"w":434,"h":160},"RegisteredFilter":{"x":1223,"y":-216,"w":437,"h":160},"ChainFilter":{"x":1223,"y":-36,"w":441,"h":166},"ChannelMemberFilter":{"x":1739,"y":-396,"w":367,"h":238},"ChannelOperatorFilter":{"x":1727,"y":-132,"w":369,"h":238},"ChannelSystem":{"x":228,"y":-600,"w":163,"h":119},"ClientSystem":{"x":444,"y":-468,"w":216,"h":107}}
+%% graph:waypoints {"g1>ISecurityFilter":[[1018,-131]],"SecurityFilterFactory>g1":[[691,-142]],"g1>ClientSystem":[[1048,-307]],"g1>ChannelSystem":[[1083,-340]]}

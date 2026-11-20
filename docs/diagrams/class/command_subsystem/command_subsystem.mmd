@@ -1,0 +1,218 @@
+classDiagram
+  namespace g1 {
+    class ConcreteCommands
+  }
+  class ICommand {
+    <<interface>>
+    + ICommand()
+    + virtual ~ICommand()
+    + virtual void execute() = 0
+  }
+  class IRCDto {
+    <<struct>>
+    + std::string command
+    + std::vector~std::string~ params
+    + std::string trailing
+    + bool hasTrailing
+    + IRCDto()
+    + IRCDto(const std::string& command, const std::vector~std::string~& params, const std::string& trailing, bool hasTrailing)
+  }
+  class CommandParser {
+    + CommandParser()
+    + ~CommandParser()
+    + IRCDto parseLine(std::string& line)
+  }
+  class CommandFactory {
+    - ClientSystem& clientSystem
+    - ChannelSystem& channelSystem
+    - SecurityFilterFactory& securityChainFactory
+    + CommandFactory(ClientSystem& clientSystem, ChannelSystem& channelSystem, SecurityFilterFactory& securityChainFactory)
+    + ~CommandFactory()
+    + ICommand* create(IRCDto& commandData, int fd)
+  }
+  class CommandSystem {
+    - CommandParser& commandParser
+    - CommandFactory& commandFactory
+    + CommandSystem(CommandParser& commandParser, CommandFactory& commandFactory)
+    + ~CommandSystem()
+    + void executeCommandLine(int fd, std::string& line)
+  }
+  class PassCommand {
+    - int fd
+    - ClientSystem& clientSystem
+    - IRCDto commandData
+    + PassCommand(int fd, ClientSystem& clientSystem, IRCDto& commandData)
+    + ~PassCommand()
+    + virtual void execute()
+  }
+  class NickCommand {
+    - int fd
+    - ClientSystem& clientSystem
+    - ChannelSystem& channelSystem
+    - IRCDto commandData
+    - SecurityFilterFactory& securityChainFactory
+    + NickCommand(int fd, ClientSystem& clientSystem, ChannelSystem& channelSystem, IRCDto& commandData, SecurityFilterFactory& securityChainFactory)
+    + ~NickCommand()
+    + virtual void execute()
+  }
+  class RealNameCommand["UserCommand"] {
+    - int fd
+    - ClientSystem& clientSystem
+    - IRCDto commandData
+    - SecurityFilterFactory& securityChainFactory
+    + RealNameCommand(int fd, ClientSystem& clientSystem, IRCDto& commandData, SecurityFilterFactory& securityChainFactory)
+    + ~RealNameCommand()
+    + virtual void execute()
+  }
+
+  class QuitCommand {
+    - int fd
+    - ClientSystem& clientSystem
+    - ChannelSystem& channelSystem
+    - IRCDto commandData
+    + QuitCommand(int fd, ClientSystem& clientSystem, ChannelSystem& channelSystem, IRCDto& commandData)
+    + ~QuitCommand()
+    + virtual void execute()
+  }
+  class PingCommand {
+    - int fd
+    - ClientSystem& clientSystem
+    - IRCDto commandData
+    + PingCommand(int fd, ClientSystem& clientSystem, IRCDto& commandData)
+    + ~PingCommand()
+    + virtual void execute()
+  }
+  class JoinCommand {
+    - int fd
+    - ClientSystem& clientSystem
+    - ChannelSystem& channelSystem
+    - IRCDto commandData
+    - SecurityFilterFactory& securityChainFactory
+    + JoinCommand(int fd, ClientSystem& clientSystem, ChannelSystem& channelSystem, IRCDto& commandData, SecurityFilterFactory& securityChainFactory)
+    + ~JoinCommand()
+    + virtual void execute()
+  }
+  class ListCommand {
+    - int fd
+    - ClientSystem& clientSystem
+    - ChannelSystem& channelSystem
+    - IRCDto commandData
+    - SecurityFilterFactory& securityChainFactory
+    + ListCommand(int fd, ClientSystem& clientSystem, ChannelSystem& channelSystem, IRCDto& commandData, SecurityFilterFactory& securityChainFactory)
+    + ~ListCommand()
+    + virtual void execute()
+  }
+  class PrivmsgCommand {
+    - int fd
+    - ClientSystem& clientSystem
+    - ChannelSystem& channelSystem
+    - IRCDto commandData
+    - SecurityFilterFactory& securityChainFactory
+    + PrivmsgCommand(int fd, ClientSystem& clientSystem, ChannelSystem& channelSystem, IRCDto& commandData, SecurityFilterFactory& securityChainFactory)
+    + ~PrivmsgCommand()
+    + virtual void execute()
+  }
+  class PartCommand {
+    - int fd
+    - ClientSystem& clientSystem
+    - ChannelSystem& channelSystem
+    - IRCDto commandData
+    - SecurityFilterFactory& securityChainFactory
+    + PartCommand(int fd, ClientSystem& clientSystem, ChannelSystem& channelSystem, IRCDto& commandData, SecurityFilterFactory& securityChainFactory)
+    + ~PartCommand()
+    + virtual void execute()
+  }
+  class KickCommand {
+    - int fd
+    - ClientSystem& clientSystem
+    - ChannelSystem& channelSystem
+    - IRCDto commandData
+    - SecurityFilterFactory& securityChainFactory
+    + KickCommand(int fd, ClientSystem& clientSystem, ChannelSystem& channelSystem, IRCDto& commandData, SecurityFilterFactory& securityChainFactory)
+    + ~KickCommand()
+    + virtual void execute()
+  }
+  class ModeCommand {
+    - int fd
+    - ClientSystem& clientSystem
+    - ChannelSystem& channelSystem
+    - IRCDto commandData
+    - SecurityFilterFactory& securityChainFactory
+    + ModeCommand(int fd, ClientSystem& clientSystem, ChannelSystem& channelSystem, IRCDto& commandData, SecurityFilterFactory& securityChainFactory)
+    + ~ModeCommand()
+    + virtual void execute()
+  }
+  class TopicCommand {
+    - int fd
+    - ClientSystem& clientSystem
+    - ChannelSystem& channelSystem
+    - IRCDto commandData
+    - SecurityFilterFactory& securityChainFactory
+    + TopicCommand(int fd, ClientSystem& clientSystem, ChannelSystem& channelSystem, IRCDto& commandData, SecurityFilterFactory& securityChainFactory)
+    + ~TopicCommand()
+    + virtual void execute()
+  }
+  class InviteCommand {
+    - int fd
+    - ClientSystem& clientSystem
+    - ChannelSystem& channelSystem
+    - IRCDto commandData
+    - SecurityFilterFactory& securityChainFactory
+    + InviteCommand(int fd, ClientSystem& clientSystem, ChannelSystem& channelSystem, IRCDto& commandData, SecurityFilterFactory& securityChainFactory)
+    + ~InviteCommand()
+    + virtual void execute()
+  }
+  class ChannelSystem {
+    <<external>>
+    "This class is defined in the "channel_subsystem" diagram"
+  }
+  class ClientSystem {
+    <<external>>
+    "This class is defined in the "client_subsystem" diagram"
+  }
+  class SecurityFilterFactory {
+    <<external>>
+    "This class is defined in the "security_filtering" diagram"
+  }
+  class Note0 {
+    "All concrete commands are composed of one IRCDto, so a composition relation should be assumed between all concrete commands and the IRCDto class"
+  }
+  class Note1 {
+    "All commands must be created using the CommandFactory class and the caller owns the new command and is responsible for its destruction"
+  }
+  class Note2 {
+    "Commands use the ClientSystem and ChannelSystem class to perform their usecase, this classes are injected via constructor in the CommandFactory as needed by each command. Association relations should be assumed between concrete commands and ClientSystem and/or ChannelSystem"
+  }
+  class Note3 {
+    "CommandSystem is a facade to the entire subsystem and must be used as its only entry point. Other components must never call other classes in this diagram directly."
+  }
+  class Note4 {
+    "Concrete commands must send their message using the ClientManager when applicable."
+  }
+  class g1
+  style CommandSystem stroke:#82b366
+  style ChannelSystem stroke:#b85450
+  style ClientSystem stroke:#b85450
+  style SecurityFilterFactory stroke:#b85450
+  style Note0 fill:#fff2cc,stroke:#d6b656,color:#111111
+  style Note1 fill:#fff2cc,stroke:#d6b656,color:#111111
+  style Note2 fill:#fff2cc,stroke:#d6b656,color:#111111
+  style Note3 fill:#fff2cc,stroke:#d6b656,color:#111111
+  style Note4 fill:#fff2cc,stroke:#d6b656,color:#111111
+
+  CommandFactory ..> ICommand : returns
+  CommandFactory ..> IRCDto : consumes
+  CommandParser ..> IRCDto : creates
+  CommandSystem o-- CommandParser : uses
+  CommandSystem o-- CommandFactory : uses
+  Note1 --> CommandFactory
+  CommandFactory o-- ChannelSystem : injects
+  CommandFactory o-- ClientSystem : injects
+  Note3 --> CommandSystem
+  CommandFactory ..> g1 : creates
+  g1 ..|> ICommand : implements
+  g1 o-- ClientSystem : uses
+  g1 o-- ChannelSystem : uses
+  g1 o-- SecurityFilterFactory
+%% graph:positions {"g1":{"x":1223,"y":-804,"w":1792,"h":1236},"ConcreteCommands":{"x":806,"y":0},"ICommand":{"x":828,"y":-251,"w":208,"h":140},"IRCDto":{"x":384,"y":144,"w":265,"h":238},"CommandParser":{"x":-336,"y":204},"CommandFactory":{"x":252,"y":-204,"w":465,"h":187},"CommandSystem":{"x":-408,"y":-180,"w":439,"h":170},"PassCommand":{"x":1247,"y":-768},"NickCommand":{"x":1247,"y":-576,"w":513,"h":220},"RealNameCommand":{"x":1247,"y":-324,"w":513,"h":215},"QuitCommand":{"x":1235,"y":-72,"w":514,"h":191},"PingCommand":{"x":1235,"y":180,"w":522,"h":175},"JoinCommand":{"x":2459,"y":-768,"w":513,"h":256},"ListCommand":{"x":2459,"y":-456,"w":513,"h":244},"PrivmsgCommand":{"x":2459,"y":-156,"w":510,"h":232},"PartCommand":{"x":1871,"y":120,"w":513,"h":244},"KickCommand":{"x":2459,"y":132,"w":513,"h":232},"ModeCommand":{"x":1871,"y":-768,"w":513,"h":232},"TopicCommand":{"x":1871,"y":-444,"w":508,"h":244},"InviteCommand":{"x":1871,"y":-144,"w":515,"h":220},"ChannelSystem":{"x":264,"y":-503,"w":211,"h":96},"ClientSystem":{"x":516,"y":-395,"w":211,"h":96},"SecurityFilterFactory":{"x":792,"y":24,"w":259,"h":95},"Note0":{"x":-396,"y":458,"w":352,"h":106},"Note1":{"x":60,"y":72,"w":256,"h":109},"Note2":{"x":21,"y":458,"w":393,"h":131},"Note3":{"x":-386,"y":-372,"w":395,"h":110},"Note4":{"x":501,"y":458,"w":271,"h":94}}
+%% graph:waypoints {"CommandFactory>g1":[[1163,-79]],"g1>ClientSystem":[[1133,-274]],"g1>ChannelSystem":[[1190,-377]],"g1>SecurityFilterFactory":[[1137,2]]}
