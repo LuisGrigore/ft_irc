@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
+- [8a9dcad](https://github.com/LuisGrigore/ft_irc/commit/8a9dcadcf30483ea5075eb2d554a512c51451b67) implemented PendingIOManager Closes #216 (**FEAT-039**) [Closes #216](https://github.com/LuisGrigore/ft_irc/issues/216)
 - [9b11083](https://github.com/LuisGrigore/ft_irc/commit/9b11083ba427cc57e7ed8670fdbcfdea54ed1458) implement RegistrationManager Closes #16 (**FEAT-004**) [Closes #16](https://github.com/LuisGrigore/ft_irc/issues/16)
 - [05c2532](https://github.com/LuisGrigore/ft_irc/commit/05c253263857975566a69b76635313c6a99d473c) implemented NickManager (**FEAT-004**)
 - [ed8752b](https://github.com/LuisGrigore/ft_irc/commit/ed8752b285857b8620cb086b33f57bdc9a5ab552) implemented AuthenticationManager Closes #12 (**FEAT-003**) [Closes #12](https://github.com/LuisGrigore/ft_irc/issues/12)
