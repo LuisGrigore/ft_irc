@@ -21,6 +21,7 @@ unit/test_AuthenticationManager.cpp
 unit/test_NickManager.cpp 
 unit/test_RegistrationManager.cpp 
 unit/tests_PendingIOManager.cpp 
+unit/test_Channel.cpp 
 )
 target_link_libraries(unit_tests PRIVATE ft_irc CppUTestExt CppUTest)
 target_include_directories(unit_tests PRIVATE ${PROJECT_INCLUDE_DIRS})
@@ -49,6 +50,7 @@ set_source_files_properties(
 	unit/test_NickManager.cpp
 	unit/test_RegistrationManager.cpp
 	unit/tests_PendingIOManager.cpp
+	unit/test_Channel.cpp
     PROPERTIES
     COMPILE_FLAGS "-isystem ${cpputest_SOURCE_DIR}/include -isystem ${cpputest_SOURCE_DIR}/CppUTestExt/include"
 )
