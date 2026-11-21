@@ -75,6 +75,8 @@ src/AuthenticationManager.cpp
 src/NickManager.cpp
 src/RegistrationManager.cpp
 src/PendingIOManager.cpp 
+src/Channel.cpp 
+src/ChannelRegistry.cpp 
 )
 target_include_directories(ft_irc PUBLIC include)
 target_compile_options(ft_irc PRIVATE ${PROJECT_WARNING_FLAGS})

@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
+- [0faea97](https://github.com/LuisGrigore/ft_irc/commit/0faea9771c6196d9f44f3a8d1c8c388d2a2b6238) implemented ChannelRegistry Closes #23 (**FEAT-005**) [Closes #23](https://github.com/LuisGrigore/ft_irc/issues/23)
+- [d6bee56](https://github.com/LuisGrigore/ft_irc/commit/d6bee569d98d7e818306df6a2793fabac2687f60) implemented Channel (**FEAT-005**)
 - [8a9dcad](https://github.com/LuisGrigore/ft_irc/commit/8a9dcadcf30483ea5075eb2d554a512c51451b67) implemented PendingIOManager Closes #216 (**FEAT-039**) [Closes #216](https://github.com/LuisGrigore/ft_irc/issues/216)
 - [9b11083](https://github.com/LuisGrigore/ft_irc/commit/9b11083ba427cc57e7ed8670fdbcfdea54ed1458) implement RegistrationManager Closes #16 (**FEAT-004**) [Closes #16](https://github.com/LuisGrigore/ft_irc/issues/16)
 - [05c2532](https://github.com/LuisGrigore/ft_irc/commit/05c253263857975566a69b76635313c6a99d473c) implemented NickManager (**FEAT-004**)
@@ -30,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Chore
 
+- [588cbe3](https://github.com/LuisGrigore/ft_irc/commit/588cbe3e64e43b09a3176673e719a23138c727a4) update changelog
+- [45fea44](https://github.com/LuisGrigore/ft_irc/commit/45fea44af1d7c7f67ed977d07cde5b36a30b4955) update changelog
 - [0214aae](https://github.com/LuisGrigore/ft_irc/commit/0214aaeee8f53f4c4cb040bdc25ae7aaed17e78c) update changelog
 - [9beeaf5](https://github.com/LuisGrigore/ft_irc/commit/9beeaf57ce6cfba08d0188b07d456113e620a267) update changelog
 - [e31f707](https://github.com/LuisGrigore/ft_irc/commit/e31f70749addaa68392f9e2413ae1164253e01da) update changelog
