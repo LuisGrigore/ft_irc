@@ -148,7 +148,7 @@ features:
     description: getNextInputLine extracts exactly one complete line, removes it from the input buffer,
       and returns false when no complete line is available, leaving partial data untouched.
   - id: AC-209
-    description: An fd stops being reported as having pending input when no complete line remains, and
+    description: An fd is reported as having pending input when no complete line remains but buffer is not empty, and
       stops being reported as having pending output once its output buffer is empty.
   - id: AC-210
     description: peekOutput does not modify the output buffer, and consumeOutput removes exactly the bytes
