@@ -26,12 +26,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Hotfixes
 
+- [6980213](https://github.com/LuisGrigore/ft_irc/commit/698021344730884b72fd8640a1a51ff8136fa3be) added documentation to PendingIOManager
+- [c8eeb64](https://github.com/LuisGrigore/ft_irc/commit/c8eeb6433fea7927eb858c06a5a103b422fb33f2) fixed PendingIOManager tests typeo
 - [b7f96fe](https://github.com/LuisGrigore/ft_irc/commit/b7f96fe8d5ae5c4f6670bac1fdd1016915a17017) fixed AC-209
 - [6f8636a](https://github.com/LuisGrigore/ft_irc/commit/6f8636a7796539b7ba54632c4541ea98ade573f1) fixed implementation plan and deleted obsolete documentation
 - [4da1ec4](https://github.com/LuisGrigore/ft_irc/commit/4da1ec4e12070165b361a1791e2b2fd287686900) updated implementation_plan.md with script (**HOTFIX-001**)
 
 ### Chore
 
+- [0f8c22a](https://github.com/LuisGrigore/ft_irc/commit/0f8c22a815c97925ab7e23d2fb15fe5ec845d812) update changelog
 - [588cbe3](https://github.com/LuisGrigore/ft_irc/commit/588cbe3e64e43b09a3176673e719a23138c727a4) update changelog
 - [45fea44](https://github.com/LuisGrigore/ft_irc/commit/45fea44af1d7c7f67ed977d07cde5b36a30b4955) update changelog
 - [0214aae](https://github.com/LuisGrigore/ft_irc/commit/0214aaeee8f53f4c4cb040bdc25ae7aaed17e78c) update changelog

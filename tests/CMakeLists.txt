@@ -20,7 +20,7 @@ unit/test_ClientRegistry.cpp
 unit/test_AuthenticationManager.cpp 
 unit/test_NickManager.cpp 
 unit/test_RegistrationManager.cpp 
-unit/tests_PendingIOManager.cpp 
+unit/test_PendingIOManager.cpp 
 unit/test_Channel.cpp 
 unit/test_ChannelRegistry.cpp 
 )
@@ -50,7 +50,7 @@ set_source_files_properties(
 	unit/test_AuthenticationManager.cpp
 	unit/test_NickManager.cpp
 	unit/test_RegistrationManager.cpp
-	unit/tests_PendingIOManager.cpp
+	unit/test_PendingIOManager.cpp
 	unit/test_Channel.cpp
 	unit/test_ChannelRegistry.cpp
     PROPERTIES
