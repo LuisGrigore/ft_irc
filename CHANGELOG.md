@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
+- [8cbdbc6](https://github.com/LuisGrigore/ft_irc/commit/8cbdbc6fdd7c16bcea2fa8692fc2dfc5847eb488) implemented ChannelSettingsManager Closes #225 (**FEAT-041**) [Closes #225](https://github.com/LuisGrigore/ft_irc/issues/225)
+- [7ccf0a5](https://github.com/LuisGrigore/ft_irc/commit/7ccf0a54cd2d4715020233dab389a2b3f8697a31) added ChannelSettingsManager tests Closes #224 (**FEAT-041**) [Closes #224](https://github.com/LuisGrigore/ft_irc/issues/224)
+- [60c345d](https://github.com/LuisGrigore/ft_irc/commit/60c345dcc6d5e7839ba28f6e3dafb443c3969fcb) implemented ChannelMembershipManager Closes #222 (**FEAT-041**) [Closes #222](https://github.com/LuisGrigore/ft_irc/issues/222)
+- [13c8620](https://github.com/LuisGrigore/ft_irc/commit/13c862018601a5f803d0bae0cb84a7c9d7cdeac9) added ChannelMembershipManager tests Closes #221 (**FEAT-041**) [Closes #221](https://github.com/LuisGrigore/ft_irc/issues/221)
 - [0faea97](https://github.com/LuisGrigore/ft_irc/commit/0faea9771c6196d9f44f3a8d1c8c388d2a2b6238) implemented ChannelRegistry Closes #23 (**FEAT-005**) [Closes #23](https://github.com/LuisGrigore/ft_irc/issues/23)
 - [d6bee56](https://github.com/LuisGrigore/ft_irc/commit/d6bee569d98d7e818306df6a2793fabac2687f60) implemented Channel (**FEAT-005**)
 - [8a9dcad](https://github.com/LuisGrigore/ft_irc/commit/8a9dcadcf30483ea5075eb2d554a512c51451b67) implemented PendingIOManager Closes #216 (**FEAT-039**) [Closes #216](https://github.com/LuisGrigore/ft_irc/issues/216)
@@ -34,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Chore
 
+- [2d1bec8](https://github.com/LuisGrigore/ft_irc/commit/2d1bec87ab89a16bd8c0adea8e56c363db14ef20) update changelog
 - [0f8c22a](https://github.com/LuisGrigore/ft_irc/commit/0f8c22a815c97925ab7e23d2fb15fe5ec845d812) update changelog
 - [588cbe3](https://github.com/LuisGrigore/ft_irc/commit/588cbe3e64e43b09a3176673e719a23138c727a4) update changelog
 - [45fea44](https://github.com/LuisGrigore/ft_irc/commit/45fea44af1d7c7f67ed977d07cde5b36a30b4955) update changelog
