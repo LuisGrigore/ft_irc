@@ -78,6 +78,7 @@ src/PendingIOManager.cpp
 src/Channel.cpp 
 src/ChannelRegistry.cpp 
 src/ChannelMembershipManager.cpp 
+src/ChannelSettingsManager.cpp 
 )
 target_include_directories(ft_irc PUBLIC include)
 target_compile_options(ft_irc PRIVATE ${PROJECT_WARNING_FLAGS})
