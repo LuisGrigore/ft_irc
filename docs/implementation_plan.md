@@ -422,7 +422,7 @@ Traceability plan for the **ft_irc** IRC server project, derived from:
 | AC-206 | ClientDetails is a plain value type that can be copied and remains valid after the client it was built from is removed or modified. | FEAT-007 |
 | AC-207 | pushInput and pushOutput append data to the target client's input or output buffer and mark that fd as having pending input or pending output. | FEAT-039 |
 | AC-208 | getNextInputLine extracts exactly one complete line, removes it from the input buffer, and returns false when no complete line is available, leaving partial data untouched. | FEAT-039 |
-| AC-209 | An fd stops being reported as having pending input when no complete line remains, and stops being reported as having pending output once its output buffer is empty. | FEAT-039 |
+| AC-209 | An fd is reported as having pending input when no complete line remains but buffer is not empty, and stops being reported as having pending output once its output buffer is empty. | FEAT-039 |
 | AC-210 | peekOutput does not modify the output buffer, and consumeOutput removes exactly the bytes reported as sent, keeping the remaining bytes in order for the next write. | FEAT-039 |
 | AC-211 | getHasPendingInput and getHasPendingOutput return consistent snapshots of the fds that currently have data to process or to send. | FEAT-039 |
 | AC-212 | Operations on an unknown fd raise the corresponding typed business exception and do not create any pending state. | FEAT-039 |

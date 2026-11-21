@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Hotfixes
 
+- [b7f96fe](https://github.com/LuisGrigore/ft_irc/commit/b7f96fe8d5ae5c4f6670bac1fdd1016915a17017) fixed AC-209
 - [6f8636a](https://github.com/LuisGrigore/ft_irc/commit/6f8636a7796539b7ba54632c4541ea98ade573f1) fixed implementation plan and deleted obsolete documentation
 - [4da1ec4](https://github.com/LuisGrigore/ft_irc/commit/4da1ec4e12070165b361a1791e2b2fd287686900) updated implementation_plan.md with script (**HOTFIX-001**)
 
