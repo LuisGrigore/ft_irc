@@ -231,6 +231,26 @@ TEST(Client, ChannelNamesAreCaseSensitive_AC_001) {
     CHECK_EQUAL((size_t)2, client.getChannel().size());
 }
 
+// Buffer clear
+
+TEST(Client, ClientInputClearBufferClearsBuffer) {
+    Client client(5);
+
+	client.pushInput("input");
+	client.clearInput();
+
+    CHECK_TRUE(client.isInputBufferEmpty());
+}
+
+TEST(Client, ClientOutputClearBufferClearsBuffer) {
+    Client client(5);
+
+	client.pushOutput("input");
+	client.clearOutput();
+
+    CHECK_TRUE(client.isOutputBufferEmpty());
+}
+
 // Buffer Empty
 
 TEST(Client, NewClientHasEmptyInputAndOutputBuffers_AC_002) {

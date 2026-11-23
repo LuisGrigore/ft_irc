@@ -111,6 +111,18 @@ class PendingIOManager {
      * @return A snapshot (copy) of the set; later operations do not modify it.
      */
     std::set<int> getHasPendingOutput() const;
+
+    /**
+     * @brief Empties input buffer.
+     * @param fd The file descriptor of the client.
+     */
+    void clearInput(int fd);
+
+    /**
+     * @brief Empties output buffer.
+     * @param fd The file descriptor of the client.
+     */
+    void clearOutput(int fd);
 };
 
 #endif // PENDING_IO_MANAGER_HPP

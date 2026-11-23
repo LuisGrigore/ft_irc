@@ -77,7 +77,10 @@ void Client::ClientBuffer::clear() { buffer.clear(); }
 
 // Client input buffer methods
 
-void Client::pushInput(const std::string& data) { inputBuffer.push(data); }
+void Client::pushInput(const std::string& data) {
+    if (!quitting)
+        inputBuffer.push(data);
+}
 
 bool Client::getNextInputLine(std::string& line) {
     size_t pos = inputBuffer.find("\n");
@@ -102,3 +105,6 @@ void Client::consumeOutput(size_t length) { outputBuffer.consume(length); }
 void Client::addChannel(const std::string& channelName) { channels.insert(channelName); }
 
 void Client::removeChannel(const std::string& channelName) { channels.erase(channelName); }
+
+void Client::clearInput() { inputBuffer.clear(); }
+void Client::clearOutput() { outputBuffer.clear(); }

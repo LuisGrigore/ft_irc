@@ -38,6 +38,8 @@ classDiagram
     + void addChannel(const std::string& channelName)
     + void removeChannel(const std::string& channelName)
     + std::set~std::string~ getChannel() const
+	+ void emptyInput()
+	+ void emptyOutput()
   }
   class ClientBuffer {
     <<buffer>>
@@ -111,6 +113,8 @@ classDiagram
     + void consumeOutput(int fd, size_t length)
     + std::set~int~ getHasPendingInput() const
     + std::set~int~ getHasPendingOutput() const
+	+ void emptyInput(int fd)
+    + void emptyOutput(int fd)
   }
   class ClientLifecycleManager {
     <<manager>>
@@ -122,9 +126,9 @@ classDiagram
     - std::set~int~ isQuitting
     + ClientLifecycleManager(ClientRegistry& clientRegistry, AuthenticationManager& authManager, RegistrationManager& registrationManager, ChannelMembershipManager& channelMembershipManager, PendingIOManager& pendingIOManager)
     + ~ClientLifecycleManager()
-    + void addClient(int fd)
+    + void addClient(int fd, const std::string& hostname)
     + void removeClient(int fd)
-    + std::set~int~ getIsQuitting() const
+	+ void setIsQuitting(int fd)
     + std::set~int~ getClientsToClose() const
   }
   class ClientSystem {
@@ -139,21 +143,19 @@ classDiagram
     + std::set~int~ getClientsToClose() const
     + std::set~int~ getHasPendingInput() const
     + std::set~int~ getHasPendingOutput() const
-    + std::set~int~ getIsQuitting() const
-    + void addClient(int fd)
+    + void addClient(int fd, const std::string& hostname)
     + void removeClient(int fd)
     + void pushInput(int fd, const std::string& data)
     + bool getNextInputLine(int fd, std::string& line)
     + void pushOutput(int fd, const std::string& data)
     + std::string peekOutput(int fd, size_t length) const
     + void consumeOutput(int fd, size_t length)
-    + void setQuitting(int fd, bool quitting)
+    + void setIsQuitting(int fd)
     + void authenticate(int fd, const std::string& password)
     + bool isAuthenticated(int fd) const
     + void setNick(int fd, const std::string& nick)
     + void setUsername(int fd, const std::string& username)
     + void setRealname(int fd, const std::string& realname)
-    + void setHostname(int fd, const std::string& hostname)
     + bool isRegistered(int fd) const
     + int getFdByNick(const std::string& nick) const
     + ClientDetails getClientDetails(int fd) const

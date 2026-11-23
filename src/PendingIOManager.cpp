@@ -61,3 +61,12 @@ void PendingIOManager::consumeOutput(int fd, size_t length) {
 std::set<int> PendingIOManager::getHasPendingOutput() const { return hasPendingOutput; }
 
 std::set<int> PendingIOManager::getHasPendingInput() const { return hasPendingInput; }
+
+void PendingIOManager::clearInput(int fd) {
+    clientRegistry.findClient(fd).clearInput();
+    hasPendingInput.erase(fd);
+}
+void PendingIOManager::clearOutput(int fd) {
+    clientRegistry.findClient(fd).clearOutput();
+    hasPendingOutput.erase(fd);
+}
