@@ -18,7 +18,7 @@
 
 namespace {
 
-bool contains(const std::set<int>& fds, int fd) { return fds.find(fd) != fds.end(); }
+    bool contains(const std::set<int>& fds, int fd) { return fds.find(fd) != fds.end(); }
 
 } // namespace
 
@@ -36,6 +36,28 @@ TEST_GROUP(PendingIOManager) {
         delete registry;
     }
 };
+
+// Buffer clear
+
+TEST(PendingIOManager, ClientInputClearBufferClearsBuffer) {
+    registry->addClient(5);
+
+    manager->pushInput(5, "hello\r\n");
+
+    manager->clearInput(5);
+
+    CHECK_TRUE(registry->findClient(5).isInputBufferEmpty());
+}
+
+TEST(PendingIOManager, ClientOutputClearBufferClearsBuffer) {
+    registry->addClient(5);
+
+    manager->pushOutput(5, "hello\r\n");
+
+    manager->clearOutput(5);
+
+    CHECK_TRUE(registry->findClient(5).isOutputBufferEmpty());
+}
 
 // Push Input
 

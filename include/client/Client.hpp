@@ -116,6 +116,16 @@ class Client {
      * @param length The number of characters to consume.
      */
     void consumeOutput(size_t length);
+
+    /**
+     * @brief Empties input buffer.
+     */
+    void clearInput();
+
+    /**
+     * @brief Empties output buffer.
+     */
+    void clearOutput();
 };
 
 #endif // CLIENT_HPP
