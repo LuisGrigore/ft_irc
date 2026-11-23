@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
+- [10c17af](https://github.com/LuisGrigore/ft_irc/commit/10c17af31500071d6f3530fa15c32231ab2869da) implemented client lifecycle manager Closes #233 (**FEAT-040**) [Closes #233](https://github.com/LuisGrigore/ft_irc/issues/233)
+- [aac0b3f](https://github.com/LuisGrigore/ft_irc/commit/aac0b3f8570bc549ee8b8df2f20d13a79f10cc7f) added tests por client lifecycle manager Closes #232 (**FEAT-040**) [Closes #232](https://github.com/LuisGrigore/ft_irc/issues/232)
 - [8cbdbc6](https://github.com/LuisGrigore/ft_irc/commit/8cbdbc6fdd7c16bcea2fa8692fc2dfc5847eb488) implemented ChannelSettingsManager Closes #225 (**FEAT-041**) [Closes #225](https://github.com/LuisGrigore/ft_irc/issues/225)
 - [7ccf0a5](https://github.com/LuisGrigore/ft_irc/commit/7ccf0a54cd2d4715020233dab389a2b3f8697a31) added ChannelSettingsManager tests Closes #224 (**FEAT-041**) [Closes #224](https://github.com/LuisGrigore/ft_irc/issues/224)
 - [60c345d](https://github.com/LuisGrigore/ft_irc/commit/60c345dcc6d5e7839ba28f6e3dafb443c3969fcb) implemented ChannelMembershipManager Closes #222 (**FEAT-041**) [Closes #222](https://github.com/LuisGrigore/ft_irc/issues/222)
@@ -39,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Chore
 
+- [2019da6](https://github.com/LuisGrigore/ft_irc/commit/2019da63b33e871c9173fd0ef8d355b78b4f13fb) update changelog
 - [77b279b](https://github.com/LuisGrigore/ft_irc/commit/77b279b01bfcf46e6f2fd429ece6fa3916a60541) update changelog
 - [aaad400](https://github.com/LuisGrigore/ft_irc/commit/aaad40039b867c7b74eed483415ec138ee3f95d2) update changelog
 - [2d1bec8](https://github.com/LuisGrigore/ft_irc/commit/2d1bec87ab89a16bd8c0adea8e56c363db14ef20) update changelog
