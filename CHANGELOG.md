@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Chore
 
+- [77b279b](https://github.com/LuisGrigore/ft_irc/commit/77b279b01bfcf46e6f2fd429ece6fa3916a60541) update changelog
 - [aaad400](https://github.com/LuisGrigore/ft_irc/commit/aaad40039b867c7b74eed483415ec138ee3f95d2) update changelog
 - [2d1bec8](https://github.com/LuisGrigore/ft_irc/commit/2d1bec87ab89a16bd8c0adea8e56c363db14ef20) update changelog
 - [0f8c22a](https://github.com/LuisGrigore/ft_irc/commit/0f8c22a815c97925ab7e23d2fb15fe5ec845d812) update changelog
