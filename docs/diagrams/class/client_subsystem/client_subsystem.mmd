@@ -64,11 +64,12 @@ classDiagram
     + void removeClient(int fd)
   }
   class NickManager {
-    <<registry>>
+    <<manager>>
     - std::map~std::string, int~ nicks
     - static const size_t NICK_MAX_LENGTH
     + NickManager()
     + ~NickManager()
+	+ static std::string normalize(std::string nick) const
     + bool isAvailable(const std::string& nick) const
     + bool reserve(const std::string& nick, int fd)
     + int getFd(const std::string& nick) const
@@ -137,8 +138,8 @@ classDiagram
     - PendingIOManager& pendingIOManager
     - AuthenticationManager& authManager
     - RegistrationManager& registrationManager
-    - ClientQueryManager& clientQueryManager
-    + ClientSystem(ClientLifecycleManager& lifecycleManager, PendingIOManager& pendingIOManager, AuthenticationManager& authManager, RegistrationManager& registrationManager, ClientQueryManager& clientQueryManager)
+	- ClientRegistry& clientRegistry;
+    + ClientSystem(ClientLifecycleManager& lifecycleManager, PendingIOManager& pendingIOManager, AuthenticationManager& authManager, RegistrationManager& registrationManager, ClientRegistry& clientRegistry)
     + ~ClientSystem()
     + std::set~int~ getClientsToClose() const
     + std::set~int~ getHasPendingInput() const

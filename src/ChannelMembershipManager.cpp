@@ -51,7 +51,7 @@ void ChannelMembershipManager::removeClientFromAllChannels(int fd) {
     Client& client = clientRegistry.findClient(fd);
 
     // Iterate over a copy: the client's own set is modified inside the loop.
-    const std::set<std::string> joined = client.getChannel();
+    const std::set<std::string> joined = client.getChannels();
 
     for (std::set<std::string>::const_iterator it = joined.begin(); it != joined.end(); ++it) {
         try {

@@ -38,7 +38,7 @@ TEST_GROUP(ChannelMembershipManager) {
 
     // True if the client's own set of joined channels lists the channel.
     bool clientListsChannel(int fd, const std::string& name) {
-        return clients->findClient(fd).getChannel().count(name) == 1;
+        return clients->findClient(fd).getChannels().count(name) == 1;
     }
 
     bool channelExists(const std::string& name) {
@@ -83,7 +83,7 @@ TEST(ChannelMembershipManager, CreateChannelDoesNotAffectOtherClients_AC_218) {
 
     CHECK_FALSE(channels->findChannel("#general").isMember(6));
     CHECK_FALSE(channels->findChannel("#general").isOperator(6));
-    CHECK_TRUE(clients->findClient(6).getChannel().empty());
+    CHECK_TRUE(clients->findClient(6).getChannels().empty());
 }
 
 TEST(ChannelMembershipManager, CreateChannelStartsWithDefaultSettings_AC_218) {
@@ -109,7 +109,7 @@ TEST(ChannelMembershipManager, CreateSeveralChannelsWithSameClient_AC_218) {
 
     CHECK_TRUE(manager->isOperator(5, "#first"));
     CHECK_TRUE(manager->isOperator(5, "#second"));
-    CHECK_EQUAL((size_t)2, clients->findClient(5).getChannel().size());
+    CHECK_EQUAL((size_t)2, clients->findClient(5).getChannels().size());
 }
 
 TEST(ChannelMembershipManager, DifferentClientsCanCreateDifferentChannels_AC_218) {
@@ -164,8 +164,8 @@ TEST(ChannelMembershipManager, AddMemberDoesNotAffectJoinedChannelsOfOtherClient
 
     manager->addMemberToChannel(6, "#general");
 
-    CHECK_EQUAL((size_t)1, clients->findClient(5).getChannel().size());
-    CHECK_TRUE(clients->findClient(7).getChannel().empty());
+    CHECK_EQUAL((size_t)1, clients->findClient(5).getChannels().size());
+    CHECK_TRUE(clients->findClient(7).getChannels().empty());
 }
 
 TEST(ChannelMembershipManager, AddMemberToSeveralChannelsTracksAllOfThem_AC_219) {
@@ -204,7 +204,7 @@ TEST(ChannelMembershipManager, RemoveClientRemovesChannelFromClientJoinedChannel
     manager->removeClientFromChannel(6, "#general");
 
     CHECK_FALSE(clientListsChannel(6, "#general"));
-    CHECK_TRUE(clients->findClient(6).getChannel().empty());
+    CHECK_TRUE(clients->findClient(6).getChannels().empty());
 }
 
 TEST(ChannelMembershipManager, RemoveClientKeepsOtherMembers_AC_219) {
@@ -239,7 +239,7 @@ TEST(ChannelMembershipManager, RemoveClientIgnoresCaseOfChannelName_AC_219) {
     manager->removeClientFromChannel(6, "#GENERAL");
 
     CHECK_FALSE(channels->findChannel("#general").isMember(6));
-    CHECK_TRUE(clients->findClient(6).getChannel().empty());
+    CHECK_TRUE(clients->findClient(6).getChannels().empty());
 }
 
 TEST(ChannelMembershipManager, ClientCanRejoinChannelAfterLeaving_AC_219) {
@@ -354,7 +354,7 @@ TEST(ChannelMembershipManager, RemovingLastMemberClearsItsJoinedChannels_AC_220)
 
     manager->removeClientFromChannel(5, "#general");
 
-    CHECK_TRUE(clients->findClient(5).getChannel().empty());
+    CHECK_TRUE(clients->findClient(5).getChannels().empty());
 }
 
 TEST(ChannelMembershipManager, RemovingLastMemberDoesNotRemoveOtherChannels_AC_220) {
@@ -407,7 +407,7 @@ TEST(ChannelMembershipManager, RemoveFromAllChannelsClearsClientJoinedChannels_A
 
     manager->removeClientFromAllChannels(6);
 
-    CHECK_TRUE(clients->findClient(6).getChannel().empty());
+    CHECK_TRUE(clients->findClient(6).getChannels().empty());
 }
 
 TEST(ChannelMembershipManager, RemoveFromAllChannelsDeletesChannelsLeftEmpty_AC_221) {
@@ -618,7 +618,7 @@ TEST(ChannelMembershipManager, QueriesDoNotModifyState_AC_222) {
     manager->isInvited(6, "#general");
 
     CHECK_EQUAL((size_t)1, channels->findChannel("#general").getMembers().size());
-    CHECK_TRUE(clients->findClient(6).getChannel().empty());
+    CHECK_TRUE(clients->findClient(6).getChannels().empty());
 }
 
 // Set operator
@@ -731,7 +731,7 @@ TEST(ChannelMembershipManager, SetOperatorOnNonMemberDoesNotCreateAnyState_AC_22
 
     CHECK_FALSE(channels->findChannel("#general").isOperator(6));
     CHECK_FALSE(channels->findChannel("#general").isMember(6));
-    CHECK_TRUE(clients->findClient(6).getChannel().empty());
+    CHECK_TRUE(clients->findClient(6).getChannels().empty());
 }
 
 TEST(ChannelMembershipManager, RevokingOperatorOnNonMemberThrowsNotMember_AC_223) {
@@ -884,7 +884,7 @@ TEST(ChannelMembershipManager, CreateChannelWithInvalidNameLeavesClientUntouched
     CHECK_THROWS(ChannelRegistry::InvalidChannelNameException,
                  manager->createChannel(5, "bad name"));
 
-    CHECK_TRUE(clients->findClient(5).getChannel().empty());
+    CHECK_TRUE(clients->findClient(5).getChannels().empty());
 }
 
 TEST(ChannelMembershipManager, CreateChannelThatExistsThrowsAlreadyExists_AC_226) {
@@ -904,7 +904,7 @@ TEST(ChannelMembershipManager, CreateChannelThatExistsDoesNotChangeItsState_AC_2
 
     CHECK_FALSE(manager->isMember(6, "#general"));
     CHECK_FALSE(manager->isOperator(6, "#general"));
-    CHECK_TRUE(clients->findClient(6).getChannel().empty());
+    CHECK_TRUE(clients->findClient(6).getChannels().empty());
     CHECK_TRUE(manager->isOperator(5, "#general"));
 }
 
@@ -918,7 +918,7 @@ TEST(ChannelMembershipManager, AddMemberToUnknownChannelDoesNotCreateIt_AC_226) 
                  manager->addMemberToChannel(5, "#missing"));
 
     CHECK_FALSE(channelExists("#missing"));
-    CHECK_TRUE(clients->findClient(5).getChannel().empty());
+    CHECK_TRUE(clients->findClient(5).getChannels().empty());
 }
 
 TEST(ChannelMembershipManager, AddMemberWithUnknownClientThrowsClientNotFound_AC_226) {
@@ -956,7 +956,7 @@ TEST(ChannelMembershipManager, AlreadyMemberDoesNotChangeStateNorConsumeInvitati
     CHECK_TRUE(manager->isOperator(6, "#general"));
     CHECK_TRUE(manager->isInvited(6, "#general"));
     CHECK_EQUAL((size_t)2, channels->findChannel("#general").getMembers().size());
-    CHECK_EQUAL((size_t)1, clients->findClient(6).getChannel().size());
+    CHECK_EQUAL((size_t)1, clients->findClient(6).getChannels().size());
 }
 
 TEST(ChannelMembershipManager, AlreadyMemberIgnoresCaseOfChannelName_AC_226) {
