@@ -26,6 +26,7 @@ unit/test_ChannelRegistry.cpp
 unit/test_ChannelMembershipManager.cpp 
 unit/test_ChannelSettingsManager.cpp 
 unit/test_ClientLifecycleManager.cpp 
+unit/test_ClientSystem.cpp 
 )
 target_link_libraries(unit_tests PRIVATE ft_irc CppUTestExt CppUTest)
 target_include_directories(unit_tests PRIVATE ${PROJECT_INCLUDE_DIRS})
@@ -34,7 +35,9 @@ if(TEST_LINK_SANITIZER_FLAGS)
     target_link_options(unit_tests PRIVATE ${TEST_LINK_SANITIZER_FLAGS})
 endif()
 
-add_executable(integration_tests  test_main.cpp)
+add_executable(integration_tests  test_main.cpp 
+integration/test_ClientSystem_integration.cpp 
+)
 target_link_libraries(integration_tests PRIVATE ft_irc CppUTestExt CppUTest)
 target_include_directories(integration_tests PRIVATE ${PROJECT_INCLUDE_DIRS})
 target_compile_options(integration_tests PRIVATE ${TEST_WARNING_FLAGS} ${TEST_COMPILE_SANITIZER_FLAGS})
@@ -59,6 +62,9 @@ set_source_files_properties(
 	unit/test_ChannelMembershipManager.cpp
 	unit/test_ChannelSettingsManager.cpp
 	unit/test_ClientLifecycleManager.cpp
+	unit/test_ClientSystem.cpp
+
+	integration/test_ClientSystem_integration.cpp
     PROPERTIES
     COMPILE_FLAGS "-isystem ${cpputest_SOURCE_DIR}/include -isystem ${cpputest_SOURCE_DIR}/CppUTestExt/include"
 )
