@@ -36,7 +36,7 @@ void Client::setRegistered(bool registered) { this->registered = registered; }
 
 void Client::setQuitting(bool quitting) { this->quitting = quitting; }
 
-std::set<std::string> Client::getChannel() const { return channels; }
+std::set<std::string> Client::getChannels() const { return channels; }
 
 // Predicates
 

@@ -25,7 +25,6 @@ class NickManager {
     static bool isDigit(char c);
     static bool isSpecial(char c);
 
-    static std::string normalize(const std::string& nick);
 
   public:
     /**
@@ -41,6 +40,8 @@ class NickManager {
 
     NickManager();
     ~NickManager();
+	
+    static std::string normalize(const std::string& nick);
 
     /**
      * @brief Checks if a nickname is available.

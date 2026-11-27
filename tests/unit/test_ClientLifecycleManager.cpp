@@ -131,7 +131,7 @@ TEST(ClientLifecycleManager, AddedClientHasNoDataChannelsOrPendingIO_AC_213) {
 
     Client& client = clients->findClient(5);
     STRCMP_EQUAL("", client.getNick().c_str());
-    CHECK_TRUE(client.getChannel().empty());
+    CHECK_TRUE(client.getChannels().empty());
     CHECK_TRUE(client.isInputBufferEmpty());
     CHECK_TRUE(client.isOutputBufferEmpty());
     CHECK_TRUE(pendingIO->getHasPendingInput().empty());

@@ -49,7 +49,7 @@ class Client {
     const std::string& getUsername() const;
     const std::string& getRealname() const;
     const std::string& getHostname() const;
-    std::set<std::string> getChannel() const;
+    std::set<std::string> getChannels() const;
 
     // Setters
     void setFd(int fd);

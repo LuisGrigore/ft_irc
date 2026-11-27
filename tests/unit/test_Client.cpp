@@ -133,7 +133,7 @@ TEST(Client, StateFlagsAreIndependent_AC_001) {
 TEST(Client, NewClientHasNoChannels_AC_001) {
     Client client(5);
 
-    CHECK_TRUE(client.getChannel().empty());
+    CHECK_TRUE(client.getChannels().empty());
 }
 
 TEST(Client, AddChannelStoresChannel_AC_001) {
@@ -141,7 +141,7 @@ TEST(Client, AddChannelStoresChannel_AC_001) {
 
     client.addChannel("#general");
 
-    std::set<std::string> channels = client.getChannel();
+    std::set<std::string> channels = client.getChannels();
     CHECK_EQUAL((size_t)1, channels.size());
     CHECK_EQUAL((size_t)1, channels.count("#general"));
 }
@@ -152,7 +152,7 @@ TEST(Client, AddChannelStoresMultipleChannels_AC_001) {
     client.addChannel("#general");
     client.addChannel("#random");
 
-    std::set<std::string> channels = client.getChannel();
+    std::set<std::string> channels = client.getChannels();
     CHECK_EQUAL((size_t)2, channels.size());
     CHECK_EQUAL((size_t)1, channels.count("#general"));
     CHECK_EQUAL((size_t)1, channels.count("#random"));
@@ -164,7 +164,7 @@ TEST(Client, AddChannelTwiceKeepsSingleEntry_AC_001) {
     client.addChannel("#general");
     client.addChannel("#general");
 
-    CHECK_EQUAL((size_t)1, client.getChannel().size());
+    CHECK_EQUAL((size_t)1, client.getChannels().size());
 }
 
 TEST(Client, RemoveChannelRemovesOnlyThatChannel_AC_001) {
@@ -174,7 +174,7 @@ TEST(Client, RemoveChannelRemovesOnlyThatChannel_AC_001) {
 
     client.removeChannel("#general");
 
-    std::set<std::string> channels = client.getChannel();
+    std::set<std::string> channels = client.getChannels();
     CHECK_EQUAL((size_t)1, channels.size());
     CHECK_EQUAL((size_t)0, channels.count("#general"));
     CHECK_EQUAL((size_t)1, channels.count("#random"));
@@ -186,7 +186,7 @@ TEST(Client, RemoveChannelEmptiesSetWhenLastChannelIsRemoved_AC_001) {
 
     client.removeChannel("#general");
 
-    CHECK_TRUE(client.getChannel().empty());
+    CHECK_TRUE(client.getChannels().empty());
 }
 
 TEST(Client, RemoveChannelNotJoinedHasNoEffect_AC_001) {
@@ -195,7 +195,7 @@ TEST(Client, RemoveChannelNotJoinedHasNoEffect_AC_001) {
 
     client.removeChannel("#random");
 
-    std::set<std::string> channels = client.getChannel();
+    std::set<std::string> channels = client.getChannels();
     CHECK_EQUAL((size_t)1, channels.size());
     CHECK_EQUAL((size_t)1, channels.count("#general"));
 }
@@ -205,18 +205,18 @@ TEST(Client, RemoveChannelCanBeCalledWithNoChannels_AC_001) {
 
     client.removeChannel("#general");
 
-    CHECK_TRUE(client.getChannel().empty());
+    CHECK_TRUE(client.getChannels().empty());
 }
 
 TEST(Client, GetChannelReturnsCopyThatDoesNotAffectClient_AC_001) {
     Client client(5);
     client.addChannel("#general");
 
-    std::set<std::string> channels = client.getChannel();
+    std::set<std::string> channels = client.getChannels();
     channels.insert("#intruder");
     channels.erase("#general");
 
-    std::set<std::string> current = client.getChannel();
+    std::set<std::string> current = client.getChannels();
     CHECK_EQUAL((size_t)1, current.size());
     CHECK_EQUAL((size_t)1, current.count("#general"));
     CHECK_EQUAL((size_t)0, current.count("#intruder"));
@@ -228,7 +228,7 @@ TEST(Client, ChannelNamesAreCaseSensitive_AC_001) {
     client.addChannel("#General");
     client.addChannel("#general");
 
-    CHECK_EQUAL((size_t)2, client.getChannel().size());
+    CHECK_EQUAL((size_t)2, client.getChannels().size());
 }
 
 // Buffer clear
