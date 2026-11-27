@@ -27,6 +27,7 @@ unit/test_ChannelMembershipManager.cpp
 unit/test_ChannelSettingsManager.cpp 
 unit/test_ClientLifecycleManager.cpp 
 unit/test_ClientSystem.cpp 
+unit/test_ChannelBroadcastManager.cpp 
 )
 target_link_libraries(unit_tests PRIVATE ft_irc CppUTestExt CppUTest)
 target_include_directories(unit_tests PRIVATE ${PROJECT_INCLUDE_DIRS})
@@ -63,6 +64,7 @@ set_source_files_properties(
 	unit/test_ChannelSettingsManager.cpp
 	unit/test_ClientLifecycleManager.cpp
 	unit/test_ClientSystem.cpp
+	unit/test_ChannelBroadcastManager.cpp
 
 	integration/test_ClientSystem_integration.cpp
     PROPERTIES
