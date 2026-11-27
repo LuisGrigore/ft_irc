@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
+- [c188aa4](https://github.com/LuisGrigore/ft_irc/commit/c188aa4fbddedc9fca5b75e820b66613fe3690d8) implemented ClientSystem Closes #34 (**FEAT-007**) [Closes #34](https://github.com/LuisGrigore/ft_irc/issues/34)
 - [10c17af](https://github.com/LuisGrigore/ft_irc/commit/10c17af31500071d6f3530fa15c32231ab2869da) implemented client lifecycle manager Closes #233 (**FEAT-040**) [Closes #233](https://github.com/LuisGrigore/ft_irc/issues/233)
 - [aac0b3f](https://github.com/LuisGrigore/ft_irc/commit/aac0b3f8570bc549ee8b8df2f20d13a79f10cc7f) added tests por client lifecycle manager Closes #232 (**FEAT-040**) [Closes #232](https://github.com/LuisGrigore/ft_irc/issues/232)
 - [8cbdbc6](https://github.com/LuisGrigore/ft_irc/commit/8cbdbc6fdd7c16bcea2fa8692fc2dfc5847eb488) implemented ChannelSettingsManager Closes #225 (**FEAT-041**) [Closes #225](https://github.com/LuisGrigore/ft_irc/issues/225)
@@ -42,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Chore
 
+- [577ef06](https://github.com/LuisGrigore/ft_irc/commit/577ef065b5844b50c1b6b37c9241db5ce959d4e4) update changelog
 - [43a5108](https://github.com/LuisGrigore/ft_irc/commit/43a510835c3f74b02efa08ea9bc0fc96e30bcbf6) update changelog
 - [2019da6](https://github.com/LuisGrigore/ft_irc/commit/2019da63b33e871c9173fd0ef8d355b78b4f13fb) update changelog
 - [77b279b](https://github.com/LuisGrigore/ft_irc/commit/77b279b01bfcf46e6f2fd429ece6fa3916a60541) update changelog
